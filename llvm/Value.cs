@@ -8,31 +8,31 @@ namespace LLVM {
 public class Value : RefBase {
     public Value(IntPtr ptr) : base(ptr) { }
 
-
     public Type Type
     {
-	get
-	{
-	    return Type.GetType(LLVM.TypeOf(this));
-	}
+        get
+        {
+            return Type.GetType(LLVM.TypeOf(this));
+        }
+    }
+
+    public string Name
+    {
+        set { LLVM.SetValueName(this, value); }
+        get { return LLVM.GetValueName(this); }
+    }
+
+    public void Dump()
+    {  
+        LLVM.DumpValue(this);
     }
 
     public static Value GetConstantInt(Type ty, Int64 val)
     {
-	return new Value(LLVM.ConstInt(ty, val, true));
+        return new Value(LLVM.ConstInt(ty, val, true));
     }
-/*
-    private static Value getType(IntPtr ptr)
-    {
-	if (_types.ContainsKey(ptr)) {
-	    return _types[ptr];
-	} else {
-	    Type ty = new Type(ptr);
-	    _types[ptr] = ty;
-	    return ty;
-	}
-    }
-    */
+
+
 }
 
 }

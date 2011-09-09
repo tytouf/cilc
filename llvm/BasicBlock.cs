@@ -9,6 +9,10 @@ public class BasicBlock : Value {
     {
     }
 
+    public BasicBlock(Function func, string name = "bb") : base(LLVM.AppendBasicBlock(func, name))
+    {
+    }
+
 }
 
 }
