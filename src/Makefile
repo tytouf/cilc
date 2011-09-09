@@ -1,10 +1,10 @@
 
 SRC_FILES = 	CLR.cs \
 		Cilc.cs \
-                Cil2Llvm.cs CodeGenType.cs CodeGenMethod.cs
+                Cil2Llvm.cs CodeGenType.cs CodeGenMethod.cs \
+		MethodBuilder.cs \
 		#CodeGenTypes.cs CodeGenType.cs \
 		#CodeGenMethod.cs \
-		#MethodBuilder.cs \
 
 LIBS = -r:Mono.Cecil.dll -r:llvm.dll
 

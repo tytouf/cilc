@@ -25,12 +25,12 @@ static class Cil2Llvm
 
     public static void Init(LLVM.Module module, LLVM.Builder builder)
     {
-	if (_module == null) {
-	    _module  = module;
-	    _builder = builder;
-	    _types   = new Dictionary<TypeReference, CodeGenType>();
-	    _methods = new Dictionary<MethodReference, MethodData>();
-	}
+        if (_module == null) {
+            _module  = module;
+            _builder = builder;
+            _types   = new Dictionary<TypeReference, CodeGenType>();
+            _methods = new Dictionary<MethodReference, MethodData>();
+        }
     }
 
 #region Emit Module
@@ -45,13 +45,13 @@ static class Cil2Llvm
     //
     public static CodeGenType GetType(TypeReference type)
     {
-    	if (_types.ContainsKey(type)) {
-	    return _types[type]; // skip, type has already been emitted.
-	}
+            if (_types.ContainsKey(type)) {
+            return _types[type]; // skip, type has already been emitted.
+        }
         
-	// Create and register type
-	//
-	CodeGenType td  = new CodeGenType(type);
+        // Create and register type
+        //
+        CodeGenType td  = new CodeGenType(type);
         _types[type] = td;
 
         return td;
@@ -62,30 +62,30 @@ static class Cil2Llvm
         _module.AddTypeName("type " + type.FullName, GetType(type).Type);
 
         if (!type.IsDefinition) {
-	    return;
-	}
+            return;
+        }
 
-	TypeDefinition td = (TypeDefinition) type;
+        TypeDefinition td = (TypeDefinition) type;
 
         if (td.HasFields) {
-	    foreach (FieldDefinition f in td.Fields) {
-		if (f.IsStatic) {
-		    EmitStaticField(f);
-		}
-	    }
-	}
+            foreach (FieldDefinition f in td.Fields) {
+        	if (f.IsStatic) {
+        	    EmitStaticField(f);
+        	}
+            }
+        }
 
-	if (td.HasNestedTypes) {
-	    foreach (TypeDefinition t in td.NestedTypes) {
-		EmitType(t);
-	    }
-	}
+        if (td.HasNestedTypes) {
+            foreach (TypeDefinition t in td.NestedTypes) {
+        	EmitType(t);
+            }
+        }
 
     }
 
     static void EmitStaticField(FieldDefinition f)
     {
-	new LLVM.GlobalVariable(_module, GetType(f.FieldType).Type, f.FullName);
+        new LLVM.GlobalVariable(_module, GetType(f.FieldType).Type, f.FullName);
     }
 #endregion
 
@@ -99,9 +99,9 @@ static class Cil2Llvm
         }
 
         MethodData md = new MethodData(method, _module);
-	_methods[method] = md;
+        _methods[method] = md;
 
-	return md;
+        return md;
     }
 
     public static void EmitDecl(MethodReference method)
@@ -111,7 +111,8 @@ static class Cil2Llvm
 
     public static void EmitBody(MethodReference method)
     {
-        //MethodBuilder.EmitBody(GetMethodData(method));
+        MethodBuilder mb = new MethodBuilder(_builder, GetMethodData(method));
+        mb.EmitBody();
     }
 #endregion
 

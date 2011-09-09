@@ -13,76 +13,50 @@ namespace Cilc {
 
 public class MethodBuilder
 {
-    LLVM.Module        _module;
     LLVM.Builder       _builder;
-    MethodDefinition   _method;
+    MethodData         _method;
+
     List<LLVM.Value>   _variables;
     Stack<LLVM.Value>  _stack;
     List<LLVM.Value>   _params;
 
-    /*
-    internal Assert(Bool expr, string msg)
+    public MethodBuilder(LLVM.Builder builder, MethodData method)
     {
-        if (expr) {
-	    StackFrame CallStack = new StackFrame(1, true);
-
-	    Console.WriteLine("Assertion failed: " + msg);
-	    Console.WriteLine("Stack: File: " + CallStack.GetFileName()
-	    + ", Line: " + CallStack.GetFileLineNumber());
-	}
-    }
-    */
-
-    public MethodBuilder(LLVM.Module module, LLVM.Builder builder, MethodDefinition method)
-    {
-        _module  = module;
-        _builder = builder;
-        _method  = method;
-        _stack   = new Stack<LLVM.Value>();
-        _params  = new List<LLVM.Value>();
+        _builder   = builder;
+        _method    = method;
+        _stack     = new Stack<LLVM.Value>();
+        _params    = new List<LLVM.Value>();
+        _variables = new List<LLVM.Value>();
     }
 
     public void EmitBody()
     {
-        LLVM.Type retTy = CodeGenType.GetType(_method.ReturnType);
-        LLVM.Type[] paramsTy;
         uint hasThis = 0;
-        
-        if (_method.HasThis) {
-            hasThis = 1;
-            paramsTy = new LLVM.Type[1] { CodeGenType.GetType(_method.DeclaringType) };
-            paramsTy = paramsTy.Concat(Array.ConvertAll(_method.Parameters.ToArray(),
-        			    t => CodeGenType.GetType(t.ParameterType))).ToArray();
-        } else {
-            paramsTy = Array.ConvertAll(_method.Parameters.ToArray(),
-        			    t => CodeGenType.GetType(t.ParameterType));
-        }
-        LLVM.Type funcTy = LLVM.Type.getFunctionType(retTy, paramsTy, false);
-        // TODO false -> varArg
-        LLVM.Function func = new Function(_module, _method.FullName, funcTy);
+        MethodDefinition meth = _method.Method as MethodDefinition;
+        LLVM.Function func = _method.Function;
 
         // Process parameters
         //
-        if (_method.HasThis) {
+        if (meth.HasThis) {
             LLVM.Value val = func.GetParam(0);
             val.Name = "this";
             _params.Add(val);
+            hasThis = 1;
         }
-        for (uint i = 0 ; i < _method.Parameters.Count ; i++) {
+        for (uint i = 0 ; i < meth.Parameters.Count ; i++) {
             LLVM.Value val = func.GetParam(i + hasThis);
-            val.Name = _method.Parameters[(int)i].Name;
+            val.Name = meth.Parameters[(int)i].Name;
             _params.Add(val);
         }
 
-        MethodBody body = _method.Body;
+        MethodBody body = meth.Body;
 
         if (body == null) {
-	    // Method may not have a body. For instance in the case of
-	    // external methods
-	    return; // end here
-	}
-
-        LLVM.BasicBlock bb = func.AppendBasicBlock("IL_0000");
+            // Method may not have a body. For instance in the case of
+            // external methods
+            return; // end here
+        }
+        LLVM.BasicBlock bb = new LLVM.BasicBlock(func, "IL_0000");
         _builder.PositionAtEnd(bb);
 
         // Process local variables
@@ -90,11 +64,13 @@ public class MethodBuilder
         if (body.HasVariables) {
             _variables = new List<LLVM.Value>();
             foreach(VariableDefinition variable in body.Variables) {
-        	LLVM.Type ty = CodeGenType.GetType(variable.VariableType);
-        	_variables.Add(_builder.AllocaInst(ty, variable.Name));
+                LLVM.Type  ty  = Cil2Llvm.GetType(variable.VariableType).Type;
+                LLVM.Value val = _builder.CreateAlloca(ty, variable.Name);
+                _variables.Add(val);
             }
         }
 
+#if TOTO
         //System.Collections.Generic.Stack<int> stacki = new System.Collections.Generic.Stack<int>();
 
         foreach(Instruction inst in body.Instructions) {
@@ -219,16 +195,18 @@ public class MethodBuilder
             else if (inst.OpCode == OpCodes.Ldc_I4_S) EmitOpCodeLdc(4, Convert.ToInt64(inst.Operand));
             else if (inst.OpCode == OpCodes.Ldc_I4) EmitOpCodeLdc(4, Convert.ToInt64(inst.Operand));
         }
-    }
 
+#endif
+    }
+#if TOTO
     internal void EmitOpCodeNewobj(MethodReference method)
     {
-	Trace.Assert(method != null);
+        Trace.Assert(method != null);
         //TODO Trace.Assert(_params,Length > n);
-	TypeReference type = method.DeclaringType;
-	Trace.Assert(type != null); // cannot be null, we are creating an obj
+        TypeReference type = method.DeclaringType;
+        Trace.Assert(type != null); // cannot be null, we are creating an obj
 
-	LLVM.Type ty       = CodeGenType.GetType(type);
+        LLVM.Type ty       = CodeGenType.GetType(type);
         LLVM.Value[] args  = { ty.getSize() };
         Value newobj       = _builder.Call(CLR.Newobj, args, "newobj");
 newobj.dump();
@@ -247,21 +225,21 @@ obj.dump();
 
     internal void EmitOpCodeCall(MethodReference method)
     {
-	Trace.Assert(method != null);
+        Trace.Assert(method != null);
         //TODO Trace.Assert(_params,Length > n);
-	TypeReference type = method.DeclaringType;
-	//LLVM.Type ty       = CodeGenType.GetType(type);
+        TypeReference type = method.DeclaringType;
+        //LLVM.Type ty       = CodeGenType.GetType(type);
 
         LLVM.Value[] args;
-	if (method.HasParameters) {
-	    int count = method.Parameters.Count;
-	    args = new LLVM.Value[count];
-	    for (int i = count - 1; i >= 0; i--) {
-	        args[i] = _stack.Pop();
-	    }
-	}
-	//TODO FIXME
-	/*
+        if (method.HasParameters) {
+            int count = method.Parameters.Count;
+            args = new LLVM.Value[count];
+            for (int i = count - 1; i >= 0; i--) {
+                args[i] = _stack.Pop();
+            }
+        }
+        //TODO FIXME
+        /*
         Value newobj       = _builder.Call(CLR.Newobj, args, "call");
         Value obj          = _builder.Convert(newobj, ty.getPointer());
 obj.dump();
@@ -294,18 +272,18 @@ obj.dump();
         LLVM.Type ty;
         switch(n) {
             case 1:
-        	ty = CLR.Int8;
-        	break;
+                ty = CLR.Int8;
+                break;
             case 2:
-        	ty = CLR.Int16;
-        	break;
+                ty = CLR.Int16;
+                break;
             case 4:
-        	ty = CLR.Int32;
-        	break;
+                ty = CLR.Int32;
+                break;
             default:
-        	// Assert(0);
-        	ty = CLR.Void;
-        	break;
+                // Assert(0);
+                ty = CLR.Void;
+                break;
         }
         _stack.Push(Value.GetConstantInt(ty, constant));
     }
@@ -370,7 +348,7 @@ obj.dump();
             _builder.Ret(RET);
         }
     }
-
+#endif
 } // end of MethodBuilder
 
 } // end of namespace Cilc

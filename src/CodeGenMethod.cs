@@ -12,7 +12,7 @@ using Mono.Cecil.Metadata;
 
 namespace Cilc {
 
-sealed class MethodData {
+public sealed class MethodData {
     LLVM.Module        _module;
     LLVM.FunctionType  _type;
     LLVM.Function      _function;
@@ -26,13 +26,13 @@ sealed class MethodData {
 
     public LLVM.FunctionType Type
     {
-	get
-	{
-	    if (_type == null) {
-		_type = ConstructType();
-	    }
-	    return _type;
-	}
+        get
+        {
+            if (_type == null) {
+                _type = ConstructType();
+            }
+            return _type;
+        }
     }
 
     public LLVM.Function Function
@@ -47,6 +47,14 @@ sealed class MethodData {
         }
     }
 
+    public MethodReference Method
+    {
+        get
+        {
+            return _method;
+        }
+    }
+
     private LLVM.FunctionType ConstructType()
     {
         LLVM.Type retTy = Cil2Llvm.GetType(_method.ReturnType).Type;
@@ -56,10 +64,10 @@ sealed class MethodData {
             paramsTy.Add(Cil2Llvm.GetType(_method.DeclaringType).Type);
         }
 
-	if (_method.HasParameters) {
-	    foreach (ParameterDefinition p in _method.Parameters) {
-		paramsTy.Add(Cil2Llvm.GetType(p.ParameterType).Type);
-	    }
+        if (_method.HasParameters) {
+            foreach (ParameterDefinition p in _method.Parameters) {
+                paramsTy.Add(Cil2Llvm.GetType(p.ParameterType).Type);
+            }
         }
 
         // TODO false -> varArg
