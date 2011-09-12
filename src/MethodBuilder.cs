@@ -65,13 +65,14 @@ public class MethodBuilder
             _variables = new List<LLVM.Value>();
             foreach(VariableDefinition variable in body.Variables) {
                 LLVM.Type  ty  = Cil2Llvm.GetType(variable.VariableType).Type;
-                LLVM.Value val = _builder.CreateAlloca(ty, variable.Name);
+		string name = "V_";
+		if (variable.Name.Length != 0) {
+		    name = variable.Name;
+		}
+                LLVM.Value val = _builder.CreateAlloca(ty, name);
                 _variables.Add(val);
             }
         }
-
-#if TOTO
-        //System.Collections.Generic.Stack<int> stacki = new System.Collections.Generic.Stack<int>();
 
         foreach(Instruction inst in body.Instructions) {
             Console.WriteLine("{0}", inst);
@@ -105,7 +106,8 @@ public class MethodBuilder
             else if (inst.OpCode == OpCodes.Ldc_I4_8) EmitOpCodeLdc(4, 8);
             else if (inst.OpCode == OpCodes.Dup) /* TODO */;
             else if (inst.OpCode == OpCodes.Pop) /* TODO */;
-            else if (inst.OpCode == OpCodes.Ret) EmitOpCodeRet(retTy);
+            else if (inst.OpCode == OpCodes.Ret) EmitOpCodeRet();
+#if TOTO
 /*
             case 0x46:  // ldind.i1
             case 0x47:  // ldind.u1
@@ -191,12 +193,11 @@ public class MethodBuilder
 
 */
             else if (inst.OpCode == OpCodes.Newobj) EmitOpCodeNewobj(inst.Operand as MethodReference);
-
+#endif
             else if (inst.OpCode == OpCodes.Ldc_I4_S) EmitOpCodeLdc(4, Convert.ToInt64(inst.Operand));
             else if (inst.OpCode == OpCodes.Ldc_I4) EmitOpCodeLdc(4, Convert.ToInt64(inst.Operand));
         }
 
-#endif
     }
 #if TOTO
     internal void EmitOpCodeNewobj(MethodReference method)
@@ -254,20 +255,28 @@ obj.dump();
     _Stack.push_back(newobj);
 */
     }
+#endif
 
-    internal void EmitOpCodeLdarg(uint n)
+    private void EmitOpCodeLdarg(uint n)
     {
-        //Assert(_params,Length > n);
+        Trace.Assert(_params.Count >= n);
         _stack.Push(_params[(int)n]);
     }
 
-    internal void EmitOpCodeLdloc(uint n)
+    private void EmitOpCodeLdloc(uint n)
     {
-        //Assert(_variables,Length > n);
-        _stack.Push(_builder.LoadInst(_variables[(int)n], "ldloc_"+n+"_"));
+        Trace.Assert(_variables.Count >= n);
+        _stack.Push(_builder.CreateLoad(_variables[(int)n], "ldloc_"+n+"_"));
     }
 
-    internal void EmitOpCodeLdc(uint n, Int64 constant)
+    private void EmitOpCodeStloc(uint n)
+    {
+        Trace.Assert(_variables.Count >= n);
+        Trace.Assert(_stack.Count > 0);
+        _builder.CreateStore(_stack.Pop(), _variables[(int)n]);
+    }
+
+    private void EmitOpCodeLdc(uint n, Int64 constant)
     {
         LLVM.Type ty;
         switch(n) {
@@ -281,44 +290,39 @@ obj.dump();
                 ty = CLR.Int32;
                 break;
             default:
-                // Assert(0);
+                Trace.Assert(false);
                 ty = CLR.Void;
                 break;
         }
-        _stack.Push(Value.GetConstantInt(ty, constant));
+        _stack.Push(LLVM.Value.GetConstantInt(ty, constant));
     }
 
-    internal void EmitOpCodeStloc(uint n)
+    private void EmitOpCodeAdd()
     {
-        // Assert(_variables.Length > n);
-        // Debug.Assert(_stack.Length > 0);
-        _builder.StoreInst((LLVM.Value)_stack.Pop(), _variables[(int)n]);
+        Trace.Assert(_stack.Count >= 2);
+        LLVM.Value B = _stack.Pop();
+        LLVM.Value A = _stack.Pop();
+        _stack.Push(_builder.CreateAdd(A, B, "add"));
     }
 
-    internal void EmitOpCodeAdd()
+    private void EmitOpCodeSub()
     {
-        // Debug.Assert(_stack.Length >= 2);
-        LLVM.Value B = (LLVM.Value)_stack.Pop();
-        LLVM.Value A = (LLVM.Value)_stack.Pop();
-        _stack.Push(_builder.AddInst(A, B, "add"));
+        Trace.Assert(_stack.Count >= 2);
+        LLVM.Value B = _stack.Pop();
+        LLVM.Value A = _stack.Pop();
+        _stack.Push(_builder.CreateSub(A, B, "sub"));
     }
 
-    internal void EmitOpCodeSub()
+    private void EmitOpCodeMul()
     {
-        // Debug.Assert(_stack.Length >= 2);
-        LLVM.Value B = (LLVM.Value)_stack.Pop();
-        LLVM.Value A = (LLVM.Value)_stack.Pop();
-        _stack.Push(_builder.SubInst(A, B, "sub"));
-    }
-
-    internal void EmitOpCodeMul()
-    {
-        // Debug.Assert(_stack.Length >= 2);
-        LLVM.Value B = (LLVM.Value)_stack.Pop();
-        LLVM.Value A = (LLVM.Value)_stack.Pop();
+        Trace.Assert(_stack.Count >= 2);
+        LLVM.Value B = _stack.Pop();
+        LLVM.Value A = _stack.Pop();
         // TODO: check types + pointer arith
-        _stack.Push(_builder.MulInst(A, B, "mul"));
+        _stack.Push(_builder.CreateMul(A, B, "mul"));
     }
+
+#if TOTO
 
     internal void EmitOpCodeDiv()
     {
@@ -338,17 +342,24 @@ obj.dump();
         _stack.Push(_builder.UDivInst(A, B, "div"));
     }
 
-    internal void EmitOpCodeRet(LLVM.Type retTy)
+#endif
+    private void EmitOpCodeRet()
     {
-        if (retTy == CLR.Void) {
-            _builder.RetVoid();
+        LLVM.Type retTy = _method.Function.GetReturnType();
+
+	System.Console.WriteLine("EmitRet {0}", _stack.Count);
+        if (retTy.Equals(CLR.Void)) {
+	    System.Console.WriteLine("void");
+	    Trace.Assert(_stack.Count == 0);
+            _builder.CreateRetVoid();
         } else {
+	    System.Console.WriteLine("ret 1");
             // TODO.FIXME must deref return Value
-            LLVM.Value RET = (LLVM.Value)_stack.Pop();
-            _builder.Ret(RET);
+	    Trace.Assert(_stack.Count >= 1);
+            LLVM.Value ret = _stack.Pop();
+            _builder.CreateRet(ret);
         }
     }
-#endif
 } // end of MethodBuilder
 
 } // end of namespace Cilc

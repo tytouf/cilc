@@ -11,7 +11,7 @@ public class IntegerType: DerivedType {
 
     public static IntegerType Get(uint bits)
     {
-        return new IntegerType(LLVM.IntType(bits));
+        return GetType(LLVM.IntType(bits)) as IntegerType;
     }
 
     public uint GetBitWidth()

@@ -9,6 +9,15 @@ public class Function : RefBase {
     {
     }
 
+    public Type GetReturnType()
+    {
+	IntPtr ptr = LLVM.GetReturnType(this);
+	if (ptr == IntPtr.Zero) {
+	    return Type.GetVoid();
+	}
+	return Type.GetType(ptr);
+    }
+
     public uint GetNumParams()
     {
 	return LLVM.CountParams(this);

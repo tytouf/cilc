@@ -26,10 +26,31 @@ public enum TypeKind {
 public class Type : RefBase {
 
     internal Type(IntPtr ptr) : base(ptr) { }
+    static Dictionary<IntPtr, Type> types = new Dictionary<IntPtr, Type>();
 
     public static Type GetType(IntPtr ptr)
     {
-	return new Type(ptr);
+	System.Console.WriteLine("GetType {0}", ptr);
+	if (types.ContainsKey(ptr)) {
+	    return types[ptr];
+	} else {
+	    return new Type(ptr);
+	}
+    }
+
+    public bool Equals(Type obj)
+    {
+	if (obj == null)
+	{
+	    return false;
+	}
+	Console.WriteLine("{0} == {1}", _ref, obj._ref);
+	return _ref == obj._ref;
+    }
+
+    public override string ToString()
+    {
+	return _ref.ToString();
     }
 
     public static IntegerType GetInt1()
@@ -62,7 +83,7 @@ public class Type : RefBase {
         return new IntegerType(LLVM.IntType(bits));
     }
 
-    public static Type GetVoid() { return GetType(LLVM.VoidType()); }
+    public static Type GetVoid() { System.Console.WriteLine("GetVoid {0}", LLVM.VoidType()); return GetType(LLVM.VoidType()); }
     public static Type GetLabel() { return GetType(LLVM.LabelType()); }
     public static Type GetOpaque() { return GetType(LLVM.OpaqueType()); }
 

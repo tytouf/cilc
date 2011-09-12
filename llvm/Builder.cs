@@ -94,9 +94,17 @@ public class Builder : RefBase {
         return new Value(LLVM.BuildAlloca(this, type, name));
     }
 
+    public Value CreateLoad(Value val, string name = "load")
+    {
+        return new Value(LLVM.BuildLoad(this, val, name));
+    }
+
+    public Value CreateStore(Value val, Value ptr)
+    {
+        return new Value(LLVM.BuildStore(this, val, ptr));
+    }
+
 #endregion
-
-
 
     public Value CreateRet(Value val)
     {
