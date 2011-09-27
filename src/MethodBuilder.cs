@@ -89,7 +89,7 @@ public class MethodBuilder
 //TODO: pre-select instruction by type (flowcontrol, ...)
 
             if (inst.OpCode == OpCodes.Nop) /* Nothing */;
-            else if (inst.OpCode == OpCodes.Break) /* TODO */;
+            else if (inst.OpCode == OpCodes.Break) EmitUnimplemented();
             else if (inst.OpCode == OpCodes.Ldarg_0) EmitOpCodeLdarg(0);
             else if (inst.OpCode == OpCodes.Ldarg_1) EmitOpCodeLdarg(1);
             else if (inst.OpCode == OpCodes.Ldarg_2) EmitOpCodeLdarg(2);
@@ -102,7 +102,7 @@ public class MethodBuilder
             else if (inst.OpCode == OpCodes.Stloc_1) EmitOpCodeStloc(1);
             else if (inst.OpCode == OpCodes.Stloc_2) EmitOpCodeStloc(2);
             else if (inst.OpCode == OpCodes.Stloc_3) EmitOpCodeStloc(3);
-            else if (inst.OpCode == OpCodes.Ldnull) /* TODO */;
+            else if (inst.OpCode == OpCodes.Ldnull) EmitUnimplemented();
             else if (inst.OpCode == OpCodes.Ldc_I4_M1) EmitOpCodeLdc(4, Convert.ToInt64(-1));
             else if (inst.OpCode == OpCodes.Ldc_I4_0) EmitOpCodeLdc(4, 0);
             else if (inst.OpCode == OpCodes.Ldc_I4_1) EmitOpCodeLdc(4, 1);
@@ -113,10 +113,9 @@ public class MethodBuilder
             else if (inst.OpCode == OpCodes.Ldc_I4_6) EmitOpCodeLdc(4, 6);
             else if (inst.OpCode == OpCodes.Ldc_I4_7) EmitOpCodeLdc(4, 7);
             else if (inst.OpCode == OpCodes.Ldc_I4_8) EmitOpCodeLdc(4, 8);
-            else if (inst.OpCode == OpCodes.Dup) /* TODO */;
-            else if (inst.OpCode == OpCodes.Pop) /* TODO */;
+            else if (inst.OpCode == OpCodes.Dup) EmitUnimplemented();
+            else if (inst.OpCode == OpCodes.Pop) EmitUnimplemented();
             else if (inst.OpCode == OpCodes.Ret) EmitOpCodeRet();
-#if TOTO
 /*
             case 0x46:  // ldind.i1
             case 0x47:  // ldind.u1
@@ -137,13 +136,16 @@ public class MethodBuilder
             case 0x56:  // stind.r4
             case 0x57:  // stind.r8
 */
+#if UNIMPLEMENTED
             else if (inst.OpCode == OpCodes.Call) EmitOpCodeCall(inst.Operand as MethodReference);
+#endif
 
             else if (inst.OpCode == OpCodes.Add) EmitOpCodeAdd();
             else if (inst.OpCode == OpCodes.Sub) EmitOpCodeSub();
             else if (inst.OpCode == OpCodes.Mul) EmitOpCodeMul();
             else if (inst.OpCode == OpCodes.Div) EmitOpCodeDiv();
             else if (inst.OpCode == OpCodes.Div_Un) EmitOpCodeDivUn();
+#if UNIMPLEMENTED
 /*
             case 0x5D:  // rem
             case 0x5E:  // rem.un
@@ -201,27 +203,47 @@ public class MethodBuilder
             case 0xE0:  // conv.u (native int)
 
 */
-            else if (inst.OpCode == OpCodes.Newobj) EmitOpCodeNewobj(inst.Operand as MethodReference);
 #endif
+            else if (inst.OpCode == OpCodes.Newobj) EmitOpCodeNewobj(inst.Operand as MethodReference);
             else if (inst.OpCode == OpCodes.Ldc_I4_S) EmitOpCodeLdc(4, Convert.ToInt64(inst.Operand));
             else if (inst.OpCode == OpCodes.Ldc_I4) EmitOpCodeLdc(4, Convert.ToInt64(inst.Operand));
+            else EmitUnimplemented();
         }
 
     }
-#if TOTO
-    internal void EmitOpCodeNewobj(MethodReference method)
+
+    private void EmitUnimplemented()
+    {
+        Console.WriteLine("Opcode is unimplemented.");
+    }
+
+    private LLVM.Value ConvertToType(LLVM.Value v, LLVM.Type toType)
+    {
+        LLVM.Type vType = v.Type;
+        if (vType.isPointer() && toType.isPointer()) {
+            return ConvertPointers(v, toType);
+        }
+        return v; // TODO, FIXME
+    }
+
+    private LLVM.Value ConvertPointers(LLVM.Value v, LLVM.Type toType)
+    {
+        Trace.Assert(v.Type.isPointer() && toType.isPointer());
+        return _builder.CreateBitCast(v, toType);
+    }
+
+    private void EmitOpCodeNewobj(MethodReference method)
     {
         Trace.Assert(method != null);
         //TODO Trace.Assert(_params,Length > n);
         TypeReference type = method.DeclaringType;
         Trace.Assert(type != null); // cannot be null, we are creating an obj
 
-        LLVM.Type ty       = CodeGenType.GetType(type);
-        LLVM.Value[] args  = { ty.getSize() };
-        Value newobj       = _builder.Call(CLR.Newobj, args, "newobj");
-newobj.dump();
-        Value obj          = _builder.Convert(newobj, ty.getPointer());
-obj.dump();
+        LLVM.Type ty      = Cil2Llvm.GetType(type);
+        LLVM.Value newobj = _builder.CreateCall(CLR.Newobj, ty.Size, "newobj");
+newobj.Dump();
+        LLVM.Value obj    = ConvertPointers(newobj, ty.GetPointerTo());
+//obj.dump();
 
         _stack.Push(obj);
 /*
@@ -232,8 +254,9 @@ obj.dump();
     _Stack.push_back(newobj);
 */
     }
+#if UNIMPLEMENTED
 
-    internal void EmitOpCodeCall(MethodReference method)
+    private void EmitOpCodeCall(MethodReference method)
     {
         Trace.Assert(method != null);
         //TODO Trace.Assert(_params,Length > n);
@@ -331,9 +354,7 @@ obj.dump();
         _stack.Push(_builder.CreateMul(A, B, "mul"));
     }
 
-#if TOTO
-
-    internal void EmitOpCodeDiv()
+    private void EmitOpCodeDiv()
     {
         // Debug.Assert(_stack.Length >= 2);
         LLVM.Value B = (LLVM.Value)_stack.Pop();
@@ -342,7 +363,7 @@ obj.dump();
         _stack.Push(_builder.SDivInst(A, B, "div"));
     }
 
-    internal void EmitOpCodeDivUn()
+    private void EmitOpCodeDivUn()
     {
         // Debug.Assert(_stack.Length >= 2);
         LLVM.Value B = (LLVM.Value)_stack.Pop();
@@ -351,7 +372,6 @@ obj.dump();
         _stack.Push(_builder.UDivInst(A, B, "div"));
     }
 
-#endif
     private void EmitOpCodeRet()
     {
         LLVM.Type retTy = _method.Function.GetReturnType();
