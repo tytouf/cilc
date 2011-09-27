@@ -97,7 +97,7 @@ sealed class CodeGenType
                 if (f.IsStatic) {
 		    continue;
 		}
-		LLVM.Type ty = Cil2Llvm.GetType(f.FieldType).Type;
+		LLVM.Type ty = Cil2Llvm.GetType(f.FieldType);
 		if (!f.FieldType.IsPrimitive) {
                     ty = ty.GetPointerTo(0);
 		}
@@ -120,7 +120,7 @@ sealed class CodeGenType
 	    List<LLVM.Type> l = new List<LLVM.Type>();
 	    TypeReference baseType = td.BaseType;
 	    if (baseType != null) {
-	        l.Add(Cil2Llvm.GetType(baseType).Type);
+	        l.Add(Cil2Llvm.GetType(baseType));
 	    } else {
 		l.Add(CLR.Object);
 	    }
@@ -129,7 +129,7 @@ sealed class CodeGenType
                 if (f.IsStatic) {
 		    continue;
 		}
-		LLVM.Type ty = Cil2Llvm.GetType(f.FieldType).Type;
+		LLVM.Type ty = Cil2Llvm.GetType(f.FieldType);
 		if (!f.FieldType.IsPrimitive) {
                     ty = ty.GetPointerTo(0);
 		}

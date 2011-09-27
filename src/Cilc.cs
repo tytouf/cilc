@@ -30,25 +30,17 @@ public class Cilc
     public LLVM.Module Module { get { return _llvmMod; } }
     public LLVM.Builder Builder { get { return _builder; } }
     
-    public void ConvertMethod(MethodReference meth)
-    {
-        foreach (ParameterDefinition param in meth.Parameters)
-        {
-            Console.WriteLine("  {0}", param);
-        }
-    }
-
     public void EmitTypes()
     {
         foreach (TypeDefinition type in _mod.Types) {
             Console.WriteLine(type.FullName);
     
             Cil2Llvm.EmitType(type);
-	    EmitMethods(type);
+	    EmitTypeMethods(type);
         }
     }
 
-    public void EmitMethods(TypeDefinition type)
+    public void EmitTypeMethods(TypeDefinition type)
     {
         foreach (MethodDefinition method in type.Methods) {
             Console.WriteLine(method.FullName);
@@ -72,6 +64,9 @@ public class Cilc
     
         module.Dump();
 	module.WriteToFile(args[1]);
+        string msg;
+        LLVM.Analysis.VerifyModule(module, LLVM.VerifierFailureAction.PrintMessageAction, out msg);
+        Console.WriteLine(msg);
         return 0;
     }
 }

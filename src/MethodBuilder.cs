@@ -64,7 +64,16 @@ public class MethodBuilder
         if (body.HasVariables) {
             _variables = new List<LLVM.Value>();
             foreach(VariableDefinition variable in body.Variables) {
-                LLVM.Type  ty  = Cil2Llvm.GetType(variable.VariableType).Type;
+                LLVM.Type  ty  = Cil2Llvm.GetType(variable.VariableType);
+
+                // FIXME: check when we want to use pointers and when we
+                // want to use primitive type. Do we want to use struct
+                // for ValueTypes ?
+                //
+                if (!variable.VariableType.IsPrimitive &&
+                    !variable.VariableType.IsValueType) {
+                    ty = ty.GetPointerTo();
+                }
 		string name = "V_";
 		if (variable.Name.Length != 0) {
 		    name = variable.Name;

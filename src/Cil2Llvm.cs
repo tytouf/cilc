@@ -43,7 +43,7 @@ static class Cil2Llvm
 #region Emit Types
     // Methods used to generate types declaration
     //
-    public static CodeGenType GetType(TypeReference type)
+    public static CodeGenType GetCodeGenType(TypeReference type)
     {
             if (_types.ContainsKey(type)) {
             return _types[type]; // skip, type has already been emitted.
@@ -56,10 +56,14 @@ static class Cil2Llvm
 
         return td;
     }
+    public static LLVM.Type GetType(TypeReference type)
+    {
+        return GetCodeGenType(type).Type;
+    }
 
     public static void EmitType(TypeReference type)
     {
-        _module.AddTypeName("type " + type.FullName, GetType(type).Type);
+        _module.AddTypeName("type " + type.FullName, GetType(type));
 
         if (!type.IsDefinition) {
             return;
@@ -85,7 +89,7 @@ static class Cil2Llvm
 
     static void EmitStaticField(FieldDefinition f)
     {
-        new LLVM.GlobalVariable(_module, GetType(f.FieldType).Type, f.FullName);
+        new LLVM.GlobalVariable(_module, GetType(f.FieldType), f.FullName);
     }
 #endregion
 
