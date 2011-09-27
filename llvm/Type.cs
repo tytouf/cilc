@@ -134,57 +134,11 @@ public class Type : RefBase {
         }
     }
 
-    public PointerType GetPointerTo(uint addressSpace)
+    public PointerType GetPointerTo(uint addressSpace = 0)
     {
 	return PointerType.Get(this, addressSpace);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-    public uint GetIntegerWidth()
-    {
-	//TODO: assert(this.isInteger());
-	return LLVM.GetIntTypeWidth(this.getRef());
-    }
-
-
-    public bool isFloatingPoint()
-    {
-	Kind kind = (Kind)LLVM.GetTypeKind(this.getRef());
-	return (kind == Kind.Float || kind == Kind.Double ||
-		kind == Kind.X86_FP80 || kind == Kind.FP128 ||
-		kind == Kind.PPC_FP128);
-    }
-
-    public Value getSize()
-    {
-        return new Value(LLVM.SizeOf(this.getRef()));
-    }
-
-    // Function Types
-
-    public static Type getFunctionType(Type returnTy, Type[] paramsTy, bool isVarArg)
-    {
-	IntPtr[] refs = Array.ConvertAll(paramsTy, t => t.getRef());
-	return getType(LLVM.FunctionType(returnTy.getRef(), refs,
-		       (uint) refs.Length, isVarArg));
-    }
-    */
 }
 
 }

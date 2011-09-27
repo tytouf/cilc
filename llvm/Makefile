@@ -1,5 +1,6 @@
 
 SRC_FILES = LLVM.cs RefBase.cs \
+            Analysis.cs \
             Builder.cs \
 	    BasicBlock.cs \
             Type.cs DerivedType.cs IntegerType.cs OpaqueType.cs \

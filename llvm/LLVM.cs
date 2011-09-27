@@ -16,7 +16,7 @@ class LLVM {
     [DllImport(LLVM_LIB, EntryPoint="LLVMGetGlobalContext")]
     public static extern IntPtr GetGlobalContext();
 
-#region "Type"
+#region Type
     [DllImport(LLVM_LIB, EntryPoint="LLVMGetTypeKind")]
     public static extern uint GetTypeKind(IntPtr ptr);
 
@@ -76,7 +76,7 @@ class LLVM {
     public static extern IntPtr GetReturnType(IntPtr funcTy);
 #endregion
 
-#region "Function"
+#region Function
     [DllImport(LLVM_LIB, EntryPoint="LLVMAddFunction")]
     public static extern IntPtr AddFunction(IntPtr module, string name, IntPtr funcTy);
     [DllImport(LLVM_LIB, EntryPoint="LLVMGetNamedFunction")]
@@ -91,7 +91,7 @@ class LLVM {
     public static extern IntPtr GetFirstParam(IntPtr func);
 #endregion
 
-#region "Value" 
+#region Value
     [DllImport(LLVM_LIB, EntryPoint="LLVMSetValueName")]
     public static extern void SetValueName(IntPtr val, string name);
     [DllImport(LLVM_LIB, EntryPoint="LLVMGetValueName")]
@@ -102,12 +102,12 @@ class LLVM {
     public static extern IntPtr TypeOf(IntPtr val);
 #endregion
 
-#region "Global"
+#region Global
     [DllImport(LLVM_LIB, EntryPoint="LLVMAddGlobal")]
     public static extern IntPtr AddGlobal(IntPtr mod, IntPtr ty, string name);
 #endregion
 
-#region "Module" 
+#region Module
     [DllImport(LLVM_LIB, EntryPoint="LLVMModuleCreateWithName")]
     public static extern IntPtr ModuleCreateWithName(string name);
     [DllImport(LLVM_LIB, EntryPoint="LLVMModuleCreateWithNameInContext")]
@@ -126,14 +126,14 @@ class LLVM {
     public static extern bool AddTypeName(IntPtr modRef, string name, IntPtr typeRef);
 #endregion
 
-#region "BasicBlock"
+#region BasicBlock
     [DllImport(LLVM_LIB, EntryPoint="LLVMAppendBasicBlock")]
     public static extern IntPtr AppendBasicBlock(IntPtr func, string name);
     [DllImport(LLVM_LIB, EntryPoint="LLVMInsertBasicBlock")]
     public static extern IntPtr InsertBasicBlock(IntPtr bb, string name);
 #endregion
 
-#region "Builder"
+#region Builder
     [DllImport(LLVM_LIB, EntryPoint="LLVMCreateBuilder")]
     public static extern IntPtr CreateBuilder();
     [DllImport(LLVM_LIB, EntryPoint="LLVMPositionBuilderAtEnd")]
@@ -193,9 +193,13 @@ class LLVM {
     //
     [DllImport(LLVM_LIB, EntryPoint="LLVMBuildCall")]
     public static extern IntPtr BuildCall(IntPtr bldRef, IntPtr fnRef, IntPtr[] argsRef, uint numArgs, string name);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMBuildIsNull")]
+    public static extern IntPtr BuildIsNull(IntPtr bldRef, IntPtr valRef, string name);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMBuildIsNotNull")]
+    public static extern IntPtr BuildIsNotNull(IntPtr bldRef, IntPtr valRef, string name);
 #endregion
 
-#region "Constant"
+#region Constant
     [DllImport(LLVM_LIB, EntryPoint="LLVMConstInt")]
     public static extern IntPtr ConstInt(IntPtr tyRef, long val, bool signExtend);
     [DllImport(LLVM_LIB, EntryPoint="LLVMSizeOf")]
@@ -206,9 +210,16 @@ class LLVM {
     public static extern IntPtr GetZero(IntPtr tyRef);
 #endregion
 
-#region "BitWriter"
+#region BitWriter
     [DllImport(LLVM_LIB, EntryPoint="LLVMWriteBitcodeToFile")]
     public static extern int WriteBitcodeToFile(IntPtr modRef, string path);
+#endregion
+
+#region Analysis
+    [DllImport(LLVM_LIB, EntryPoint="LLVMVerifyModule")]
+    public static extern bool VerifyModule(IntPtr modRef, uint action, out string outMessage);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMVerifyFunction")]
+    public static extern bool VerifyFunction(IntPtr fnRef, uint action);
 #endregion
 } // end of class LLVM
 

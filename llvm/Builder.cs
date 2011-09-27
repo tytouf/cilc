@@ -106,6 +106,52 @@ public class Builder : RefBase {
 
 #endregion
 
+#region Other Instructions
+
+    public Value CreateCall(Value callee, string name = "")
+    {
+        return new Value(LLVM.BuildCall(this, callee, null, 0,  name));
+    }
+
+    public Value CreateCall(Value callee, Value[] args, string name = "")
+    {
+	IntPtr[] argsPtr = Array.ConvertAll(args, t => (IntPtr)t);
+        return new Value(LLVM.BuildCall(this, callee, argsPtr, (uint)args.Length, name));
+    }
+
+    public Value CreateCall(Value callee, Value arg1, string name = "")
+    {
+        Value[] args = { arg1 };
+        return CreateCall(callee, args, name);
+    }
+
+    public Value CreateCall(Value callee, Value arg1, Value arg2, string name = "")
+    {
+        Value[] args = { arg1, arg2 };
+        return CreateCall(callee, args, name);
+    }
+
+    public Value CreateCall(Value callee, Value arg1, Value arg2, Value arg3, string name = "")
+    {
+        Value[] args = { arg1, arg2, arg3 };
+        return CreateCall(callee, args, name);
+    }
+
+    public Value CreateCall(Value callee, Value arg1, Value arg2, Value arg3, Value arg4, string name = "")
+    {
+        Value[] args = { arg1, arg2, arg3, arg4 };
+        return CreateCall(callee, args, name);
+    }
+
+#endregion
+
+#region Casts
+    public Value CreateBitCast(Value val, Type destTy, string name = "")
+    {
+        return new Value(LLVM.BuildBitCast(this, val, destTy, name));
+    }
+
+#endregion
     public Value CreateRet(Value val)
     {
         return new Value(LLVM.BuildRet(this, val));
