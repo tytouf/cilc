@@ -20,12 +20,13 @@ public enum TypeKind {
     Pointer,     /**< Pointers */
     Opaque,      /**< Opaque: type with unknown structure */
     Vector,      /**< SIMD 'packed' format, or other vector type */
-    Metadata     /**< Metadata */
+    Metadata,     /**< Metadata */
+    Unknown,
 };
 
 public class Type : RefBase {
 
-    internal Type(IntPtr ptr) : base(ptr) { }
+    internal Type(IntPtr ptr) : base(ptr) { _kind = TypeKind.Unknown; }
     static Dictionary<IntPtr, Type> types = new Dictionary<IntPtr, Type>();
 
     public static Type GetType(IntPtr ptr)
@@ -38,6 +39,16 @@ public class Type : RefBase {
 	}
     }
 
+    public static IntegerType GetIntegerType(IntPtr ptr)
+    {
+	System.Console.WriteLine("GetType {0}", ptr);
+	if (types.ContainsKey(ptr)) {
+	    return types[ptr] as IntegerType;
+	} else {
+            // TODO: check based on field in Type.kind == Kind.IntegerType
+	    return new IntegerType(ptr);
+	}
+    }
     public bool Equals(Type obj)
     {
 	if (obj == null)
@@ -55,43 +66,47 @@ public class Type : RefBase {
 
     public static IntegerType GetInt1()
     {
-        return new IntegerType(LLVM.Int1Type());
+        return GetIntegerType(LLVM.Int1Type());
     }
 
     public static IntegerType GetInt8()
     {
-        return new IntegerType(LLVM.Int8Type());
+        return GetIntegerType(LLVM.Int8Type());
     }
 
     public static IntegerType GetInt16()
     {
-        return new IntegerType(LLVM.Int16Type());
+        return GetIntegerType(LLVM.Int16Type());
     }
 
     public static IntegerType GetInt32()
     {
-        return new IntegerType(LLVM.Int32Type());
+        return GetIntegerType(LLVM.Int32Type());
     }
 
     public static IntegerType GetInt64()
     {
-        return new IntegerType(LLVM.Int64Type());
+        return GetIntegerType(LLVM.Int64Type());
     }
 
     public static IntegerType GetIntN(uint bits)
     {
-        return new IntegerType(LLVM.IntType(bits));
+        return GetIntegerType(LLVM.IntType(bits));
     }
 
     public static Type GetVoid() { System.Console.WriteLine("GetVoid {0}", LLVM.VoidType()); return GetType(LLVM.VoidType()); }
     public static Type GetLabel() { return GetType(LLVM.LabelType()); }
     public static Type GetOpaque() { return GetType(LLVM.OpaqueType()); }
 
+    private TypeKind _kind;
     public TypeKind Kind
     {
 	get
 	{
-	    return (TypeKind)LLVM.GetTypeKind(this);
+            if (_kind == TypeKind.Unknown) {
+                _kind = (TypeKind)LLVM.GetTypeKind(this);
+            }
+            return _kind;
 	}
     }
 

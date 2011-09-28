@@ -22,6 +22,19 @@ public class Module : RefBase {
 	}
     }
 */
+
+    public string DataLayout
+    {
+        get { return LLVM.GetDataLayout(this); }
+        set { LLVM.SetDataLayout(this, value); }
+    }
+
+    public string TargetTriple
+    {
+        get { return LLVM.GetTarget(this); }
+        set { LLVM.SetTarget(this, value); }
+    }
+
     public int WriteToFile(string filename)
     {
         return LLVM.WriteBitcodeToFile(this.getRef(), filename);

@@ -9,6 +9,11 @@ public class IntegerType: DerivedType {
     {
     }
 
+    internal static IntegerType Get(IntPtr ptr)
+    {
+        return GetIntegerType(ptr);
+    }
+
     public static IntegerType Get(uint bits)
     {
         return GetType(LLVM.IntType(bits)) as IntegerType;

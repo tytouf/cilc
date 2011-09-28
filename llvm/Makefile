@@ -10,7 +10,8 @@ SRC_FILES = LLVM.cs RefBase.cs \
             Function.cs \
             TypeHandle.cs \
             Value.cs GlobalVariable.cs \
-            Module.cs
+            Module.cs \
+            TargetData.cs
 
 all: $(SRC_FILES)
 	gmcs -t:library -out:llvm.dll $(SRC_FILES)

@@ -119,6 +119,16 @@ class LLVM {
     [DllImport(LLVM_LIB, EntryPoint="LLVMDisposeModule")]
     public static extern void DisposeModule(IntPtr modRef);
 
+    [DllImport(LLVM_LIB, EntryPoint="LLVMGetDataLayout")]
+    public static extern string GetDataLayout(IntPtr modRef);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMSetDataLayout")]
+    public static extern void SetDataLayout(IntPtr modRef, string triple);
+
+    [DllImport(LLVM_LIB, EntryPoint="LLVMGetTarget")]
+    public static extern string GetTarget(IntPtr modRef);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMSetTarget")]
+    public static extern void SetTarget(IntPtr modRef, string triple);
+
     [DllImport(LLVM_LIB, EntryPoint="LLVMDumpModule")]
     public static extern void DumpModule(IntPtr modRef);
 
@@ -187,6 +197,8 @@ class LLVM {
     public static extern IntPtr BuildTrunc(IntPtr bldRef, IntPtr val, IntPtr destTy, string name);
     [DllImport(LLVM_LIB, EntryPoint="LLVMBuildSExt")]
     public static extern IntPtr BuildSExt(IntPtr bldRef, IntPtr val, IntPtr destTy, string name);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMBuildIntCast")]
+    public static extern IntPtr BuildIntCast(IntPtr bldRef, IntPtr val, IntPtr destTy, string name);
     [DllImport(LLVM_LIB, EntryPoint="LLVMBuildBitCast")]
     public static extern IntPtr BuildBitCast(IntPtr bldRef, IntPtr val, IntPtr destTy, string name);
 
@@ -220,6 +232,19 @@ class LLVM {
     public static extern bool VerifyModule(IntPtr modRef, uint action, out string outMessage);
     [DllImport(LLVM_LIB, EntryPoint="LLVMVerifyFunction")]
     public static extern bool VerifyFunction(IntPtr fnRef, uint action);
+#endregion
+
+#region Targets
+    [DllImport(LLVM_LIB, EntryPoint="LLVMCreateTargetData")]
+    public static extern IntPtr CreateTargetData(string rep);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMByteOrder")]
+    public static extern uint ByteOrder(IntPtr tgtDataRef);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMPointerSize")]
+    public static extern uint PointerSize(IntPtr tgtDataRef);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMIntPtrType")]
+    public static extern IntPtr IntPtrType(IntPtr tgtDataRef);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMDisposeTargetData")]
+    public static extern void DisposeTargetData(IntPtr tgtDataRef);
 #endregion
 } // end of class LLVM
 

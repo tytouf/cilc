@@ -146,6 +146,11 @@ public class Builder : RefBase {
 #endregion
 
 #region Casts
+    public Value CreateIntCast(Value val, Type destTy, string name = "")
+    {
+        return new Value(LLVM.BuildIntCast(this, val, destTy, name));
+    }
+
     public Value CreateBitCast(Value val, Type destTy, string name = "")
     {
         return new Value(LLVM.BuildBitCast(this, val, destTy, name));
