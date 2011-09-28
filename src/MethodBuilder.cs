@@ -136,9 +136,7 @@ public class MethodBuilder
             case 0x56:  // stind.r4
             case 0x57:  // stind.r8
 */
-#if UNIMPLEMENTED
-            else if (inst.OpCode == OpCodes.Call) EmitOpCodeCall(inst.Operand as MethodReference);
-#endif
+            else if (inst.OpCode == OpCodes.Call) EmitUnimplemented();//FIXME: EmitOpCodeCall(inst.Operand as MethodReference);
 
             else if (inst.OpCode == OpCodes.Add) EmitOpCodeAdd();
             else if (inst.OpCode == OpCodes.Sub) EmitOpCodeSub();
@@ -221,31 +219,40 @@ public class MethodBuilder
     {
         LLVM.Type vType = v.Type;
         if (vType.isPointer() && toType.isPointer()) {
-            return ConvertPointers(v, toType);
+            return ConvertPointer(v, toType);
         }
         return v; // TODO, FIXME
     }
 
-    private LLVM.Value ConvertPointers(LLVM.Value v, LLVM.Type toType)
+    private LLVM.Value ConvertPointer(LLVM.Value v, LLVM.Type toType)
     {
         Trace.Assert(v.Type.isPointer() && toType.isPointer());
         return _builder.CreateBitCast(v, toType);
     }
 
+    private LLVM.Value ConvertInteger(LLVM.Value v, LLVM.Type toType)
+    {
+        Trace.Assert(v.Type.isInteger() && toType.isInteger());
+        return _builder.CreateIntCast(v, toType); // signed cast
+    }
+
     private void EmitOpCodeNewobj(MethodReference method)
     {
         Trace.Assert(method != null);
-        //TODO Trace.Assert(_params,Length > n);
         TypeReference type = method.DeclaringType;
         Trace.Assert(type != null); // cannot be null, we are creating an obj
 
         LLVM.Type ty      = Cil2Llvm.GetType(type);
-        LLVM.Value newobj = _builder.CreateCall(CLR.Newobj, ty.Size, "newobj");
+        LLVM.Value size   = ConvertInteger(ty.Size, CLR.Native);
+        LLVM.Value newobj = _builder.CreateCall(CLR.Newobj, size, "newobj");
 newobj.Dump();
-        LLVM.Value obj    = ConvertPointers(newobj, ty.GetPointerTo());
+        LLVM.Value obj    = ConvertPointer(newobj, ty.GetPointerTo());
 //obj.dump();
 
         _stack.Push(obj);
+        //TODO: Trace.Assert(method.ReturnType == Void);
+        EmitOpCodeCall(method);
+        _stack.Push(obj);
 /*
     // Cast to object type, call ctor and push on the stack
     //
@@ -254,31 +261,35 @@ newobj.Dump();
     _Stack.push_back(newobj);
 */
     }
-#if UNIMPLEMENTED
-
     private void EmitOpCodeCall(MethodReference method)
     {
         Trace.Assert(method != null);
-        //TODO Trace.Assert(_params,Length > n);
         TypeReference type = method.DeclaringType;
-        //LLVM.Type ty       = CodeGenType.GetType(type);
 
         LLVM.Value[] args;
-        if (method.HasParameters) {
-            int count = method.Parameters.Count;
-            args = new LLVM.Value[count];
-            for (int i = count - 1; i >= 0; i--) {
-                args[i] = _stack.Pop();
-            }
-        }
-        //TODO FIXME
-        /*
-        Value newobj       = _builder.Call(CLR.Newobj, args, "call");
-        Value obj          = _builder.Convert(newobj, ty.getPointer());
-obj.dump();
-        _stack.Push(obj);
-*/
+        int count = 0;
 
+        if (method.HasThis) {
+            count++;
+        }
+
+        if (method.HasParameters) {
+            count += method.Parameters.Count;
+        }
+
+        Trace.Assert(_stack.Count >= count);
+        args = new LLVM.Value[count];
+
+        for (int i = count - 1; i >= 0; i--) {
+	    args[i] = _stack.Pop();
+        }
+
+        LLVM.Value ret = _builder.CreateCall(Cil2Llvm.GetMethod(method), args, "call");
+        LLVM.Type retTy = Cil2Llvm.GetType(method.ReturnType);
+
+        if (retTy != CLR.Void) {
+            _stack.Push(ret);
+        }
 /*
     // Cast to object type, call ctor and push on the stack
     //
@@ -287,7 +298,6 @@ obj.dump();
     _Stack.push_back(newobj);
 */
     }
-#endif
 
     private void EmitOpCodeLdarg(uint n)
     {

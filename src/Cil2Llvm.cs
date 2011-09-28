@@ -108,6 +108,11 @@ static class Cil2Llvm
         return md;
     }
 
+    public static LLVM.Function GetMethod(MethodReference method)
+    {
+        return GetMethodData(method).Function;
+    }
+
     public static void EmitDecl(MethodReference method)
     {
         LLVM.Function func = GetMethodData(method).Function;
