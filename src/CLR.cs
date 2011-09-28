@@ -33,6 +33,8 @@ abstract class CLR {
 	
 	 public static void Initialize(LLVM.Module module)
 	 {
+            TargetData tgt = new TargetData("e-p:32:32:32-i1:8:8-i8:8:8-i16:16:16-i32:32:32-i64:32:64-f32:32:32-f64:32:64-v64:64:64-v128:128:128-a0:0:64-f80:32:32-n8:16:32");
+
 	    Void = LLVM.Type.GetVoid();
 	    module.AddTypeName("type System.Void", Void);
 	    Bool = LLVM.Type.GetInt8();
@@ -48,16 +50,16 @@ abstract class CLR {
 	    Int64 = LLVM.Type.GetInt64();
 	    module.AddTypeName("type System.Int64", Int64);
 
-            Native = Int32;
+            Native = tgt.GetIntPtrType();
 	    module.AddTypeName("type System.Native", Native);
-            //TODO: Native = IntegerType::get(*context, targetData->GetPointerSizeInBits());
+
             Ptr = Native.GetPointerTo(0);
 	    module.AddTypeName("type System.Ptr", Ptr);
 	    
 	    Object = LLVM.StructType.Get(new LLVM.Type[2] { Int32, Int32 }, false);
 	    module.AddTypeName("type System.Object", Object);
 
-	    String = LLVM.Type.GetInt8(); // FIXME
+	    String = LLVM.Type.GetInt8(); // FIXME, TODO
 	    module.AddTypeName("type System.String", String);
 
 	    // Initialize constants
