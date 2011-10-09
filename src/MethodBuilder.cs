@@ -88,7 +88,7 @@ public class MethodBuilder
 
 //TODO: pre-select instruction by type (flowcontrol, ...)
 
-            if (inst.OpCode == OpCodes.Nop) /* Nothing */;
+            if (inst.OpCode == OpCodes.Nop) { } /* Nothing */
             else if (inst.OpCode == OpCodes.Break) EmitUnimplemented();
             else if (inst.OpCode == OpCodes.Ldarg_0) EmitOpCodeLdarg(0);
             else if (inst.OpCode == OpCodes.Ldarg_1) EmitOpCodeLdarg(1);
@@ -136,7 +136,7 @@ public class MethodBuilder
             case 0x56:  // stind.r4
             case 0x57:  // stind.r8
 */
-            else if (inst.OpCode == OpCodes.Call) EmitUnimplemented();//FIXME: EmitOpCodeCall(inst.Operand as MethodReference);
+            else if (inst.OpCode == OpCodes.Call) EmitOpCodeCall(inst.Operand as MethodReference);
 
             else if (inst.OpCode == OpCodes.Add) EmitOpCodeAdd();
             else if (inst.OpCode == OpCodes.Sub) EmitOpCodeSub();
@@ -221,6 +221,7 @@ public class MethodBuilder
         if (vType.isPointer() && toType.isPointer()) {
             return ConvertPointer(v, toType);
         }
+        Console.WriteLine("v was not converted to toType");
         return v; // TODO, FIXME
     }
 
@@ -261,30 +262,33 @@ newobj.Dump();
     _Stack.push_back(newobj);
 */
     }
+
+
     private void EmitOpCodeCall(MethodReference method)
     {
         Trace.Assert(method != null);
-        TypeReference type = method.DeclaringType;
 
-        LLVM.Value[] args;
-        int count = 0;
+        List<LLVM.Type> argsTy = new List<LLVM.Type>();
 
         if (method.HasThis) {
-            count++;
+            argsTy.Add(Cil2Llvm.GetType(method.DeclaringType).GetPointerTo());
         }
 
         if (method.HasParameters) {
-            count += method.Parameters.Count;
+            foreach(ParameterDefinition p in method.Parameters) {
+                argsTy.Add(Cil2Llvm.GetType(p.ParameterType));
+            }
         }
 
-        Trace.Assert(_stack.Count >= count);
-        args = new LLVM.Value[count];
+        Trace.Assert(_stack.Count >= argsTy.Count);
+        LLVM.Value[] args = new LLVM.Value[argsTy.Count];
 
-        for (int i = count - 1; i >= 0; i--) {
-          args[i] = _stack.Pop();
+        for (int i = argsTy.Count - 1; i >= 0; i--) {
+            args[i] = ConvertToType(_stack.Pop(), argsTy[i]);
+
         }
 
-        LLVM.Value ret = _builder.CreateCall(Cil2Llvm.GetMethod(method), args, "");
+        LLVM.Value ret = _builder.CreateCall(Cil2Llvm.GetMethod(method), args);
         LLVM.Type retTy = Cil2Llvm.GetType(method.ReturnType);
 
         if (retTy != CLR.Void) {

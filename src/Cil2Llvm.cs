@@ -115,7 +115,7 @@ static class Cil2Llvm
 
     public static void EmitDecl(MethodReference method)
     {
-        LLVM.Function func = GetMethodData(method).Function;
+        //LLVM.Function func = GetMethodData(method).Function;
     }
 
     public static void EmitBody(MethodReference method)
