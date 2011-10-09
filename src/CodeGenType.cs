@@ -99,7 +99,7 @@ sealed class CodeGenType
 		}
 		LLVM.Type ty = Cil2Llvm.GetType(f.FieldType);
 		if (!f.FieldType.IsPrimitive) {
-                    ty = ty.GetPointerTo(0);
+                    ty = ty.GetPointerTo();
 		}
 		l.Add(ty);
 		_fieldsOffsets[f] = offset;
@@ -131,7 +131,7 @@ sealed class CodeGenType
 		}
 		LLVM.Type ty = Cil2Llvm.GetType(f.FieldType);
 		if (!f.FieldType.IsPrimitive) {
-                    ty = ty.GetPointerTo(0);
+                    ty = ty.GetPointerTo();
 		}
 		l.Add(ty);
 		_fieldsOffsets[f] = offset;

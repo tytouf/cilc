@@ -284,7 +284,7 @@ newobj.Dump();
 	    args[i] = _stack.Pop();
         }
 
-        LLVM.Value ret = _builder.CreateCall(Cil2Llvm.GetMethod(method), args, "call");
+        LLVM.Value ret = _builder.CreateCall(Cil2Llvm.GetMethod(method), args, "");
         LLVM.Type retTy = Cil2Llvm.GetType(method.ReturnType);
 
         if (retTy != CLR.Void) {

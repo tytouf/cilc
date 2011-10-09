@@ -61,12 +61,16 @@ public sealed class MethodData {
         List<LLVM.Type> paramsTy = new List<LLVM.Type>();
         
         if (_method.HasThis) {
-            paramsTy.Add(Cil2Llvm.GetType(_method.DeclaringType));
+            paramsTy.Add(Cil2Llvm.GetType(_method.DeclaringType).GetPointerTo());
         }
 
         if (_method.HasParameters) {
             foreach (ParameterDefinition p in _method.Parameters) {
-                paramsTy.Add(Cil2Llvm.GetType(p.ParameterType));
+		LLVM.Type ty = Cil2Llvm.GetType(p.ParameterType);
+		if (!p.ParameterType.IsPrimitive) {
+                    ty = ty.GetPointerTo();
+		}
+                paramsTy.Add(ty);
             }
         }
 
