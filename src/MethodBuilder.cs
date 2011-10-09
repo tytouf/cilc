@@ -74,10 +74,10 @@ public class MethodBuilder
                     !variable.VariableType.IsValueType) {
                     ty = ty.GetPointerTo();
                 }
-		string name = "V_";
-		if (variable.Name.Length != 0) {
-		    name = variable.Name;
-		}
+            string name = "V_";
+            if (variable.Name.Length != 0) {
+                name = variable.Name;
+            }
                 LLVM.Value val = _builder.CreateAlloca(ty, name);
                 _variables.Add(val);
             }
@@ -281,7 +281,7 @@ newobj.Dump();
         args = new LLVM.Value[count];
 
         for (int i = count - 1; i >= 0; i--) {
-	    args[i] = _stack.Pop();
+          args[i] = _stack.Pop();
         }
 
         LLVM.Value ret = _builder.CreateCall(Cil2Llvm.GetMethod(method), args, "");
@@ -386,15 +386,15 @@ newobj.Dump();
     {
         LLVM.Type retTy = _method.Function.GetReturnType();
 
-	System.Console.WriteLine("EmitRet {0}", _stack.Count);
+      System.Console.WriteLine("EmitRet {0}", _stack.Count);
         if (retTy.Equals(CLR.Void)) {
-	    System.Console.WriteLine("void");
-	    Trace.Assert(_stack.Count == 0);
+          System.Console.WriteLine("void");
+          Trace.Assert(_stack.Count == 0);
             _builder.CreateRetVoid();
         } else {
-	    System.Console.WriteLine("ret 1");
+          System.Console.WriteLine("ret 1");
             // TODO.FIXME must deref return Value
-	    Trace.Assert(_stack.Count >= 1);
+          Trace.Assert(_stack.Count >= 1);
             LLVM.Value ret = _stack.Pop();
             _builder.CreateRet(ret);
         }

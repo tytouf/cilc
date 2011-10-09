@@ -24,7 +24,7 @@ public class Cilc
         _llvmMod = module;
         _mod     = ModuleDefinition.ReadModule(filename);
         _builder = new LLVM.Builder();
-	Cil2Llvm.Init(module, _builder);
+      Cil2Llvm.Init(module, _builder);
     }
 
     public LLVM.Module Module { get { return _llvmMod; } }
@@ -33,22 +33,22 @@ public class Cilc
     public void EmitTypes()
     {
         foreach (TypeDefinition type in _mod.Types) {
-	    if (type.FullName == "<Module>") {
-		continue;
-	    }
+          if (type.FullName == "<Module>") {
+            continue;
+          }
             Console.WriteLine(type.FullName);
     
             Cil2Llvm.EmitType(type);
-	    EmitTypeMethods(type);
+          EmitTypeMethods(type);
         }
     }
 
     public void EmitTypeMethods(TypeDefinition type)
     {
         foreach (MethodDefinition method in type.Methods) {
-	    if (type.FullName == "<Module>") {
-		continue;
-	    }
+          if (type.FullName == "<Module>") {
+            continue;
+          }
             Console.WriteLine(method.FullName);
             Cil2Llvm.EmitDecl(method);
             Cil2Llvm.EmitBody(method);
@@ -57,10 +57,10 @@ public class Cilc
 
     static int Main(string[] args)
     {
-	if (args.Length < 2) {
-	    Console.WriteLine("Usage: cilc.exe file.exe file.ll");
-	    return 1;
-	}
+      if (args.Length < 2) {
+          Console.WriteLine("Usage: cilc.exe file.exe file.ll");
+          return 1;
+      }
         Module module = new Module(args[0]);
         Cilc cilc = new Cilc(module, args[0]);
     
@@ -74,7 +74,7 @@ public class Cilc
         cilc.EmitTypes();
     
         module.Dump();
-	module.WriteToFile(args[1]);
+      module.WriteToFile(args[1]);
         string msg;
         LLVM.Analysis.VerifyModule(module, LLVM.VerifierFailureAction.PrintMessageAction, out msg);
         Console.WriteLine(msg);

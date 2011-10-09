@@ -21,29 +21,29 @@ sealed class CodeGenType
 
     public CodeGenType(TypeReference tr)
     {
-	_fieldsOffsets = new Dictionary<FieldDefinition, uint>();
-	_constructed   = false;
-	_opaque   = LLVM.OpaqueType.Get(); //type opaque
+        _fieldsOffsets = new Dictionary<FieldDefinition, uint>();
+        _constructed   = false;
+        _opaque   = LLVM.OpaqueType.Get(); //type opaque
         _handle   = new LLVM.TypeHandle(_opaque);
-	_typeRef  = tr;
+        _typeRef  = tr;
     }
 
     public LLVM.Type Type
     {
-	get
-	{
-	    if (!_constructed) {
-		LLVM.Type type = ConstructType(_typeRef);
+        get
+        {
+            if (!_constructed) {
+                LLVM.Type type = ConstructType(_typeRef);
                 _opaque.RefineAbstractTypeTo(type);
-	    }
-	    return _handle.Resolve();
-	}
+            }
+            return _handle.Resolve();
+        }
     }
 
     private LLVM.Type ConstructType(TypeReference type)
     {
-	_constructed = true;
-	LLVM.Type retTy = null;
+        _constructed = true;
+        LLVM.Type retTy = null;
 
         switch(type.MetadataType) {
             case MetadataType.Void:
@@ -70,78 +70,78 @@ sealed class CodeGenType
             case MetadataType.String:
                 retTy = CLR.String;
                 break;
-	    case MetadataType.Object:
-	        retTy = CLR.Object;
-		break;
+            case MetadataType.Object:
+                retTy = CLR.Object;
+                break;
             case MetadataType.ValueType:
-		retTy = ConstructValueType(type);
+                retTy = ConstructValueType(type);
                 break;
             case MetadataType.Class:
-		retTy = ConstructClassType(type);
+                retTy = ConstructClassType(type);
                 break;
             default:
                 Console.WriteLine(">> not primitive {0}, {1}", type.MetadataType, type.IsDefinition);
                 break;
         }
     
-	return retTy;
+        return retTy;
     }
 
     private LLVM.Type ConstructValueType(TypeReference type)
     {
-	if (type.IsDefinition) {
-	    TypeDefinition td = (TypeDefinition) type;
-	    List<LLVM.Type> l = new List<LLVM.Type>();
-	    uint offset = 0;
-	    foreach (FieldDefinition f in td.Fields) {
+        if (type.IsDefinition) {
+            TypeDefinition td = (TypeDefinition) type;
+            List<LLVM.Type> l = new List<LLVM.Type>();
+            uint offset = 0;
+            foreach (FieldDefinition f in td.Fields) {
                 if (f.IsStatic) {
-		    continue;
-		}
-		LLVM.Type ty = Cil2Llvm.GetType(f.FieldType);
-		if (!f.FieldType.IsPrimitive) {
+                    continue;
+                }
+                LLVM.Type ty = Cil2Llvm.GetType(f.FieldType);
+                if (!f.FieldType.IsPrimitive) {
                     ty = ty.GetPointerTo();
-		}
-		l.Add(ty);
-		_fieldsOffsets[f] = offset;
-		offset++;
+                }
+                l.Add(ty);
+                _fieldsOffsets[f] = offset;
+                offset++;
 
-	    }
-	    return LLVM.StructType.Get(l.ToArray(), false);
-	} else {
-	    Trace.Assert(false, "type is a TypeReference");
-	}
-	return null;
+            }
+            return LLVM.StructType.Get(l.ToArray(), false);
+        } else {
+            Trace.Assert(false, "type is a TypeReference");
+        }
+        return null;
     }
 
     private LLVM.Type ConstructClassType(TypeReference type)
     {
-	if (type.IsDefinition) {
-	    TypeDefinition td = (TypeDefinition) type;
-	    List<LLVM.Type> l = new List<LLVM.Type>();
-	    TypeReference baseType = td.BaseType;
-	    if (baseType != null) {
-	        l.Add(Cil2Llvm.GetType(baseType));
-	    } else {
-		l.Add(CLR.Object);
-	    }
-	    uint offset = 1;
-	    foreach (FieldDefinition f in td.Fields) {
+        if (type.IsDefinition) {
+            TypeDefinition td = (TypeDefinition) type;
+            List<LLVM.Type> l = new List<LLVM.Type>();
+            TypeReference baseType = td.BaseType;
+            if (baseType != null) {
+                l.Add(Cil2Llvm.GetType(baseType));
+            } else {
+                l.Add(CLR.Object);
+            }
+            uint offset = 1;
+            foreach (FieldDefinition f in td.Fields) {
                 if (f.IsStatic) {
-		    continue;
-		}
-		LLVM.Type ty = Cil2Llvm.GetType(f.FieldType);
-		if (!f.FieldType.IsPrimitive) {
+                    continue;
+                }
+                LLVM.Type ty = Cil2Llvm.GetType(f.FieldType);
+                if (!f.FieldType.IsPrimitive) {
                     ty = ty.GetPointerTo();
-		}
-		l.Add(ty);
-		_fieldsOffsets[f] = offset;
-		offset++;
-	    }
-	    return LLVM.StructType.Get(l.ToArray(), false);
-	} else {
-	    Trace.Assert(false, "type is a TypeReference");
-	}
-	return null;
+                }
+                l.Add(ty);
+                _fieldsOffsets[f] = offset;
+                offset++;
+            }
+            return LLVM.StructType.Get(l.ToArray(), false);
+        } else {
+            Trace.Assert(false, "type is a TypeReference");
+        }
+        return null;
     }
 
 } // end of class CodeGenType

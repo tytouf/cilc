@@ -73,15 +73,15 @@ static class Cil2Llvm
 
         if (td.HasFields) {
             foreach (FieldDefinition f in td.Fields) {
-        	if (f.IsStatic) {
-        	    EmitStaticField(f);
-        	}
+              if (f.IsStatic) {
+                  EmitStaticField(f);
+              }
             }
         }
 
         if (td.HasNestedTypes) {
             foreach (TypeDefinition t in td.NestedTypes) {
-        	EmitType(t);
+              EmitType(t);
             }
         }
 

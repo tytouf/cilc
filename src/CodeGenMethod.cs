@@ -66,10 +66,10 @@ public sealed class MethodData {
 
         if (_method.HasParameters) {
             foreach (ParameterDefinition p in _method.Parameters) {
-		LLVM.Type ty = Cil2Llvm.GetType(p.ParameterType);
-		if (!p.ParameterType.IsPrimitive) {
+                LLVM.Type ty = Cil2Llvm.GetType(p.ParameterType);
+                if (!p.ParameterType.IsPrimitive) {
                     ty = ty.GetPointerTo();
-		}
+                }
                 paramsTy.Add(ty);
             }
         }
