@@ -33,6 +33,9 @@ public class Cilc
     public void EmitTypes()
     {
         foreach (TypeDefinition type in _mod.Types) {
+	    if (type.FullName == "<Module>") {
+		continue;
+	    }
             Console.WriteLine(type.FullName);
     
             Cil2Llvm.EmitType(type);
@@ -43,6 +46,9 @@ public class Cilc
     public void EmitTypeMethods(TypeDefinition type)
     {
         foreach (MethodDefinition method in type.Methods) {
+	    if (type.FullName == "<Module>") {
+		continue;
+	    }
             Console.WriteLine(method.FullName);
             Cil2Llvm.EmitDecl(method);
             Cil2Llvm.EmitBody(method);
