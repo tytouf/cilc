@@ -192,6 +192,16 @@ class LLVM {
     [DllImport(LLVM_LIB, EntryPoint="LLVMBuildUDiv")]
     public static extern IntPtr BuildUDiv(IntPtr bldRef, IntPtr leftRef, IntPtr rightRef, string name);
 
+    // Logic
+    [DllImport(LLVM_LIB, EntryPoint="LLVMBuildAnd")]
+    public static extern IntPtr BuildAnd(IntPtr bldRef, IntPtr leftRef, IntPtr rightRef, string name);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMBuildOr")]
+    public static extern IntPtr BuildOr(IntPtr bldRef, IntPtr leftRef, IntPtr rightRef, string name);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMBuildXor")]
+    public static extern IntPtr BuildXor(IntPtr bldRef, IntPtr leftRef, IntPtr rightRef, string name);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMBuildNot")]
+    public static extern IntPtr BuildNot(IntPtr bldRef, IntPtr vRef, string name);
+
     //
     [DllImport(LLVM_LIB, EntryPoint="LLVMBuildTrunc")]
     public static extern IntPtr BuildTrunc(IntPtr bldRef, IntPtr val, IntPtr destTy, string name);

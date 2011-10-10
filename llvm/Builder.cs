@@ -75,16 +75,38 @@ public class Builder : RefBase {
         return new Value(LLVM.BuildFMul(this, left, right, name));
     }
 
-    public Value SDivInst(Value left, Value right, string name)
+    public Value CreateSDivInst(Value left, Value right, string name)
     {
-        return new Value(LLVM.BuildSDiv(this.getRef(), left.getRef(), right.getRef(), name));
+        return new Value(LLVM.BuildSDiv(this, left, right, name));
     }
 
-    public Value UDivInst(Value left, Value right, string name)
+    public Value CreateUDivInst(Value left, Value right, string name)
     {
-        return new Value(LLVM.BuildUDiv(this.getRef(), left.getRef(), right.getRef(), name));
+        return new Value(LLVM.BuildUDiv(this, left, right, name));
     }
 
+#endregion
+
+#region Logic
+    public Value CreateAnd(Value left, Value right, string name)
+    {
+        return new Value(LLVM.BuildAnd(this, left, right, name));
+    }
+
+    public Value CreateOr(Value left, Value right, string name)
+    {
+        return new Value(LLVM.BuildOr(this, left, right, name));
+    }
+
+    public Value CreateXor(Value left, Value right, string name)
+    {
+        return new Value(LLVM.BuildXor(this, left, right, name));
+    }
+
+    public Value CreateNot(Value v, string name)
+    {
+        return new Value(LLVM.BuildNot(this, v, name));
+    }
 #endregion
 
 #region Memory Instructions

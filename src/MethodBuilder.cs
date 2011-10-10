@@ -143,18 +143,19 @@ public class MethodBuilder
             else if (inst.OpCode == OpCodes.Mul) EmitOpCodeMul();
             else if (inst.OpCode == OpCodes.Div) EmitOpCodeDiv();
             else if (inst.OpCode == OpCodes.Div_Un) EmitOpCodeDivUn();
+
+            else if (inst.OpCode == OpCodes.And) EmitOpCodeAnd();
+            else if (inst.OpCode == OpCodes.Or) EmitOpCodeOr();
+            else if (inst.OpCode == OpCodes.Xor) EmitOpCodeXor();
+            else if (inst.OpCode == OpCodes.Not) EmitOpCodeNot();
 #if UNIMPLEMENTED
 /*
             case 0x5D:  // rem
             case 0x5E:  // rem.un
-            case 0x5F:  // and
-            case 0x60:  // or
-            case 0x61:  // xor
             case 0x62:  // shl
             case 0x63:  // shr
             case 0x64:  // shr.un
             case 0x65:  // neg
-            case 0x66:  // not
             case 0x67:  // conv.i1
             case 0x68:  // conv.i2
             case 0x69:  // conv.i4
@@ -374,7 +375,7 @@ newobj.Dump();
         LLVM.Value B = (LLVM.Value)_stack.Pop();
         LLVM.Value A = (LLVM.Value)_stack.Pop();
         // TODO: check types + pointer arith
-        _stack.Push(_builder.SDivInst(A, B, "div"));
+        _stack.Push(_builder.CreateSDivInst(A, B, "div"));
     }
 
     private void EmitOpCodeDivUn()
@@ -383,7 +384,42 @@ newobj.Dump();
         LLVM.Value B = (LLVM.Value)_stack.Pop();
         LLVM.Value A = (LLVM.Value)_stack.Pop();
         // TODO: check types + pointer arith
-        _stack.Push(_builder.UDivInst(A, B, "div"));
+        _stack.Push(_builder.CreateUDivInst(A, B, "div"));
+    }
+
+    private void EmitOpCodeAnd()
+    {
+        Trace.Assert(_stack.Count >= 2);
+        LLVM.Value B = (LLVM.Value)_stack.Pop();
+        LLVM.Value A = (LLVM.Value)_stack.Pop();
+        // TODO: check types + pointer arith
+        _stack.Push(_builder.CreateAnd(A, B, "and"));
+    }
+
+    private void EmitOpCodeOr()
+    {
+        Trace.Assert(_stack.Count >= 2);
+        LLVM.Value B = (LLVM.Value)_stack.Pop();
+        LLVM.Value A = (LLVM.Value)_stack.Pop();
+        // TODO: check types + pointer arith
+        _stack.Push(_builder.CreateOr(A, B, "or"));
+    }
+
+    private void EmitOpCodeXor()
+    {
+        Trace.Assert(_stack.Count >= 2);
+        LLVM.Value B = (LLVM.Value)_stack.Pop();
+        LLVM.Value A = (LLVM.Value)_stack.Pop();
+        // TODO: check types + pointer arith
+        _stack.Push(_builder.CreateXor(A, B, "xor"));
+    }
+
+    private void EmitOpCodeNot()
+    {
+        Trace.Assert(_stack.Count >= 1);
+        LLVM.Value V = (LLVM.Value)_stack.Pop();
+        // TODO: check types + pointer arith
+        _stack.Push(_builder.CreateNot(V, "not"));
     }
 
     private void EmitOpCodeRet()
