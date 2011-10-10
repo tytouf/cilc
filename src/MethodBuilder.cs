@@ -291,7 +291,7 @@ newobj.Dump();
         LLVM.Value ret = _builder.CreateCall(Cil2Llvm.GetMethod(method), args);
         LLVM.Type retTy = Cil2Llvm.GetType(method.ReturnType);
 
-        if (retTy != CLR.Void) {
+        if (!retTy.Equals(CLR.Void)) {
             _stack.Push(ret);
         }
 /*
@@ -370,7 +370,7 @@ newobj.Dump();
 
     private void EmitOpCodeDiv()
     {
-        // Debug.Assert(_stack.Length >= 2);
+        Trace.Assert(_stack.Count >= 2);
         LLVM.Value B = (LLVM.Value)_stack.Pop();
         LLVM.Value A = (LLVM.Value)_stack.Pop();
         // TODO: check types + pointer arith
@@ -379,7 +379,7 @@ newobj.Dump();
 
     private void EmitOpCodeDivUn()
     {
-        // Debug.Assert(_stack.Length >= 2);
+        Trace.Assert(_stack.Count >= 2);
         LLVM.Value B = (LLVM.Value)_stack.Pop();
         LLVM.Value A = (LLVM.Value)_stack.Pop();
         // TODO: check types + pointer arith
