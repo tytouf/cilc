@@ -112,7 +112,7 @@ class LLVM {
     public static extern IntPtr ModuleCreateWithName(string name);
     [DllImport(LLVM_LIB, EntryPoint="LLVMModuleCreateWithNameInContext")]
     public static extern IntPtr
-	ModuleCreateWithNameInContext(string name, IntPtr ctxRef);
+        ModuleCreateWithNameInContext(string name, IntPtr ctxRef);
 
     [DllImport(LLVM_LIB, EntryPoint="LLVMGetModuleContext")]
     public static extern IntPtr GetModuleContext(IntPtr modRef);

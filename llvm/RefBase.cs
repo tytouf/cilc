@@ -11,40 +11,40 @@ public abstract class RefBase
 
     public override bool Equals(Object obj)
     {
-	if (obj == null)
-	{
-	    return false;
-	}
-	RefBase rb = obj as RefBase;
-	Console.WriteLine("{0} == {1}", _ref, rb._ref);
-	return _ref == rb._ref;
+        if (obj == null)
+        {
+            return false;
+        }
+        RefBase rb = obj as RefBase;
+        Console.WriteLine("{0} == {1}", _ref, rb._ref);
+        return _ref == rb._ref;
     }
 
     public bool Equals(RefBase obj)
     {
-	if (obj == null)
-	{
-	    return false;
-	}
-	Console.WriteLine("{0} == {1}", _ref, obj._ref);
-	return _ref == obj._ref;
+        if (obj == null)
+        {
+            return false;
+        }
+        Console.WriteLine("{0} == {1}", _ref, obj._ref);
+        return _ref == obj._ref;
     }
 
     /*
     public static bool operator ==(RefBase a, RefBase b)
     {
-	if (System.Object.ReferenceEquals(a, b)) {
-	    return true;
-	}
+        if (System.Object.ReferenceEquals(a, b)) {
+            return true;
+        }
         if (a == null || b == null) {
-	    return false;
-	}
-	return a._ref == b._ref;
+            return false;
+        }
+        return a._ref == b._ref;
     }
 
     public static bool operator !=(RefBase a, RefBase b)
     {
-	return !(a == b);
+        return !(a == b);
     }
     */
 
@@ -55,21 +55,21 @@ public abstract class RefBase
 
     protected internal RefBase(IntPtr reference)
     {
-	if (reference == IntPtr.Zero)
-	    throw new ArgumentNullException("reference");
+        if (reference == IntPtr.Zero)
+            throw new ArgumentNullException("reference");
 
-	_ref = reference;
+        _ref = reference;
     }
 
     public static implicit operator IntPtr(RefBase This)
     {
-	return This._ref;
+        return This._ref;
     }
 
 
     public IntPtr getRef()
     {
-	return _ref;
+        return _ref;
     }
 }
 

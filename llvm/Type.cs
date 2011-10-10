@@ -31,37 +31,37 @@ public class Type : RefBase {
 
     public static Type GetType(IntPtr ptr)
     {
-	System.Console.WriteLine("GetType {0}", ptr);
-	if (types.ContainsKey(ptr)) {
-	    return types[ptr];
-	} else {
-	    return new Type(ptr);
-	}
+        System.Console.WriteLine("GetType {0}", ptr);
+        if (types.ContainsKey(ptr)) {
+            return types[ptr];
+        } else {
+            return new Type(ptr);
+        }
     }
 
     public static IntegerType GetIntegerType(IntPtr ptr)
     {
-	System.Console.WriteLine("GetType {0}", ptr);
-	if (types.ContainsKey(ptr)) {
-	    return types[ptr] as IntegerType;
-	} else {
+        System.Console.WriteLine("GetType {0}", ptr);
+        if (types.ContainsKey(ptr)) {
+            return types[ptr] as IntegerType;
+        } else {
             // TODO: check based on field in Type.kind == Kind.IntegerType
-	    return new IntegerType(ptr);
-	}
+            return new IntegerType(ptr);
+        }
     }
     public bool Equals(Type obj)
     {
-	if (obj == null)
-	{
-	    return false;
-	}
-	Console.WriteLine("{0} == {1}", _ref, obj._ref);
-	return _ref == obj._ref;
+        if (obj == null)
+        {
+            return false;
+        }
+        Console.WriteLine("{0} == {1}", _ref, obj._ref);
+        return _ref == obj._ref;
     }
 
     public override string ToString()
     {
-	return _ref.ToString();
+        return _ref.ToString();
     }
 
     public static IntegerType GetInt1()
@@ -101,57 +101,57 @@ public class Type : RefBase {
     private TypeKind _kind;
     public TypeKind Kind
     {
-	get
-	{
+        get
+        {
             if (_kind == TypeKind.Unknown) {
                 _kind = (TypeKind)LLVM.GetTypeKind(this);
             }
             return _kind;
-	}
+        }
     }
 
     public bool isInteger()
     {
-	return this.Kind == TypeKind.Integer;
+        return this.Kind == TypeKind.Integer;
     }
 
     public bool isPointer()
     {
-	return this.Kind == TypeKind.Pointer;
+        return this.Kind == TypeKind.Pointer;
     }
 
     public bool isOpaque()
     {
-	return this.Kind == TypeKind.Opaque;
+        return this.Kind == TypeKind.Opaque;
     }
 
     public Value Zero
     {
         get
-	{
-	    return new Value(LLVM.GetZero(this));
+        {
+            return new Value(LLVM.GetZero(this));
         }
     }
 
     public Value Size
     {
         get
-	{
-	    return new Value(LLVM.SizeOf(this));
+        {
+            return new Value(LLVM.SizeOf(this));
         }
     }
 
     public Value Align
     {
         get
-	{
-	    return new Value(LLVM.AlignOf(this));
+        {
+            return new Value(LLVM.AlignOf(this));
         }
     }
 
     public PointerType GetPointerTo(uint addressSpace = 0)
     {
-	return PointerType.Get(this, addressSpace);
+        return PointerType.Get(this, addressSpace);
     }
 
 }

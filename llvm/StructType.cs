@@ -12,9 +12,9 @@ public class StructType : CompositeType {
 
     public static StructType Get(Type[] types, bool packed = false)
     {
-	IntPtr[] ptrs = Array.ConvertAll(types, t => (IntPtr)t);
+        IntPtr[] ptrs = Array.ConvertAll(types, t => (IntPtr)t);
 
-	return new StructType(LLVM.StructType(ptrs, (uint)ptrs.Length, packed));
+        return new StructType(LLVM.StructType(ptrs, (uint)ptrs.Length, packed));
     }
 
     public uint GetNumElements()

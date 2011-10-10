@@ -23,24 +23,23 @@ public class Function : Value { // should inherit GlobalValue -> Constant -> Use
 
     public uint GetNumParams()
     {
-	return LLVM.CountParams(this);
+        return LLVM.CountParams(this);
     }
 
     public void GetParams(Type[] parms)
     {
-	//TODO: LLVM.GetParams(this, parms);
+        //TODO: LLVM.GetParams(this, parms);
     }
 
     public Value GetParam(uint idx)
     {
-	return new Value(LLVM.GetParam(this, idx));
+        return new Value(LLVM.GetParam(this, idx));
     }
 
     public Value GetFirstParam()
     {
-	return new Value(LLVM.GetFirstParam(this));
+        return new Value(LLVM.GetFirstParam(this));
     }
-
 }
 
 }

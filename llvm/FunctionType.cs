@@ -12,9 +12,9 @@ public class FunctionType : DerivedType {
     public static FunctionType Get(Type returnTy, Type[] paramsTy,
                                    bool isVarArg)
     {
-	IntPtr[] parms = Array.ConvertAll(paramsTy, t => (IntPtr)t);
-	return new FunctionType(LLVM.FunctionType(returnTy, parms,
-		       (uint) parms.Length, isVarArg));
+        IntPtr[] parms = Array.ConvertAll(paramsTy, t => (IntPtr)t);
+        return new FunctionType(LLVM.FunctionType(returnTy, parms,
+                                (uint) parms.Length, isVarArg));
     }
 
     public static FunctionType Get(Type returnTy, bool isVarArg)

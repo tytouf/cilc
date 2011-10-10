@@ -16,10 +16,10 @@ public class Module : RefBase {
 
     public Context Context
     {
-	get
-	{
-	    return new Context(LLVM.GetModuleContext(this));
-	}
+        get
+        {
+            return new Context(LLVM.GetModuleContext(this));
+        }
     }
 */
 
@@ -42,12 +42,12 @@ public class Module : RefBase {
 
     public void Dump()
     {
-	LLVM.DumpModule(this);
+        LLVM.DumpModule(this);
     }
 
     public bool AddTypeName(string name, Type type)
     {
-	return LLVM.AddTypeName(this, name, type);
+        return LLVM.AddTypeName(this, name, type);
     }
 }
 

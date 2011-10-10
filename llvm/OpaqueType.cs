@@ -11,7 +11,7 @@ public class OpaqueType : DerivedType {
 
     public static OpaqueType Get()
     {
-	return new OpaqueType(LLVM.OpaqueType());
+        return new OpaqueType(LLVM.OpaqueType());
     }
 }
 

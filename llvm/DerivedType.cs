@@ -11,7 +11,7 @@ public class DerivedType : Type {
 
     public void RefineAbstractTypeTo(Type concreteType)
     {
-	LLVM.RefineType(this, concreteType);
+        LLVM.RefineType(this, concreteType);
     }
 }
 
