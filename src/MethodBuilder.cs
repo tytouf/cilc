@@ -390,17 +390,14 @@ newobj.Dump();
     {
         LLVM.Type retTy = _method.Function.GetReturnType();
 
-      System.Console.WriteLine("EmitRet {0}", _stack.Count);
         if (retTy.Equals(CLR.Void)) {
-          System.Console.WriteLine("void");
-          Trace.Assert(_stack.Count == 0);
+            Trace.Assert(_stack.Count == 0);
             _builder.CreateRetVoid();
         } else {
-          System.Console.WriteLine("ret 1");
             // TODO.FIXME must deref return Value
-          Trace.Assert(_stack.Count >= 1);
+            Trace.Assert(_stack.Count >= 1);
             LLVM.Value ret = _stack.Pop();
-            _builder.CreateRet(ret);
+            _builder.CreateRet(ConvertToType(ret, retTy));
         }
     }
 } // end of MethodBuilder
