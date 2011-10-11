@@ -219,6 +219,10 @@ class LLVM {
     public static extern IntPtr BuildIsNull(IntPtr bldRef, IntPtr valRef, string name);
     [DllImport(LLVM_LIB, EntryPoint="LLVMBuildIsNotNull")]
     public static extern IntPtr BuildIsNotNull(IntPtr bldRef, IntPtr valRef, string name);
+
+    // Struct
+    [DllImport(LLVM_LIB, EntryPoint="LLVMBuildStructGEP")]
+    public static extern IntPtr BuildStructGEP(IntPtr bldRef, IntPtr valRef, uint idx, string name);
 #endregion
 
 #region Constant

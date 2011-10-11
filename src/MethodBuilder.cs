@@ -148,6 +148,10 @@ public class MethodBuilder
             else if (inst.OpCode == OpCodes.Or) EmitOpCodeOr();
             else if (inst.OpCode == OpCodes.Xor) EmitOpCodeXor();
             else if (inst.OpCode == OpCodes.Not) EmitOpCodeNot();
+
+            else if (inst.OpCode == OpCodes.Ldfld) EmitOpCodeLdfld(inst.Operand as FieldReference);
+            else if (inst.OpCode == OpCodes.Stfld) EmitOpCodeStfld(inst.Operand as FieldReference);
+
 #if UNIMPLEMENTED
 /*
             case 0x5D:  // rem
@@ -264,6 +268,38 @@ newobj.Dump();
 */
     }
 
+    private void EmitOpCodeLdfld(FieldReference field)
+    {
+        Trace.Assert(field != null);
+        Trace.Assert(_stack.Count >= 1);
+        Trace.Assert(field.IsDefinition);
+
+        CodeGenType ty = Cil2Llvm.GetCodeGenType(field.DeclaringType);
+        FieldDefinition f = field as FieldDefinition;
+
+        uint offset = ty.GetFieldOffset(f);
+        LLVM.Value obj = _stack.Pop();
+        Trace.Assert(obj.Type == ty.Type.GetPointerTo());
+        LLVM.Value ptr = _builder.CreateStructGEP(obj, offset, field.Name + " pointer");
+        LLVM.Value fld = _builder.CreateLoad(ptr, "ldfld");
+        _stack.Push(fld);
+    }
+
+    private void EmitOpCodeStfld(FieldReference field)
+    {
+        Trace.Assert(field != null);
+        Trace.Assert(_stack.Count >= 2);
+        Trace.Assert(field.IsDefinition);
+
+        CodeGenType ty = Cil2Llvm.GetCodeGenType(field.DeclaringType);
+        FieldDefinition f = field as FieldDefinition;
+
+        uint offset = ty.GetFieldOffset(f);
+        LLVM.Value val = _stack.Pop();
+        LLVM.Value obj = _stack.Pop();
+        LLVM.Value ptr = _builder.CreateStructGEP(obj, offset, field.Name + " pointer");
+        _builder.CreateStore(ptr, val);
+    }
 
     private void EmitOpCodeCall(MethodReference method)
     {

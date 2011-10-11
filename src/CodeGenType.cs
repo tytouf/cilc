@@ -28,6 +28,11 @@ sealed class CodeGenType
         _typeRef  = tr;
     }
 
+    public uint GetFieldOffset(FieldDefinition f)
+    {
+        return _fieldsOffsets[f];
+    }
+
     public LLVM.Type Type
     {
         get

@@ -179,6 +179,14 @@ public class Builder : RefBase {
     }
 
 #endregion
+
+#region Struct
+    public Value CreateStructGEP(Value val, uint idx, string name = "")
+    {
+        return new Value(LLVM.BuildStructGEP(this, val, idx, name));
+    }
+#endregion
+
     public Value CreateRet(Value val)
     {
         return new Value(LLVM.BuildRet(this, val));
