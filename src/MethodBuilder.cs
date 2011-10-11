@@ -113,8 +113,8 @@ public class MethodBuilder
             else if (inst.OpCode == OpCodes.Ldc_I4_6) EmitOpCodeLdc(4, 6);
             else if (inst.OpCode == OpCodes.Ldc_I4_7) EmitOpCodeLdc(4, 7);
             else if (inst.OpCode == OpCodes.Ldc_I4_8) EmitOpCodeLdc(4, 8);
-            else if (inst.OpCode == OpCodes.Dup) EmitUnimplemented();
-            else if (inst.OpCode == OpCodes.Pop) EmitUnimplemented();
+            else if (inst.OpCode == OpCodes.Dup) EmitOpCodeDup();
+            else if (inst.OpCode == OpCodes.Pop) EmitOpCodePop();
             else if (inst.OpCode == OpCodes.Ret) EmitOpCodeRet();
 /*
             case 0x46:  // ldind.i1
@@ -420,6 +420,19 @@ newobj.Dump();
         LLVM.Value V = (LLVM.Value)_stack.Pop();
         // TODO: check types + pointer arith
         _stack.Push(_builder.CreateNot(V, "not"));
+    }
+
+    private void EmitOpCodeDup()
+    {
+        Trace.Assert(_stack.Count >= 1);
+        LLVM.Value V = _stack.Peek();
+        _stack.Push(V);
+    }
+
+    private void EmitOpCodePop()
+    {
+        Trace.Assert(_stack.Count >= 1);
+        _stack.Pop();
     }
 
     private void EmitOpCodeRet()
