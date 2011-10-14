@@ -88,8 +88,33 @@ public class MethodBuilder
             }
         }
 
+        // parse all flowcontrol instructions a first time to create
+        // basic blocks with the labels these instructions point to.
+        //
+        List<int> labels = new List<int>();
+        foreach(Instruction inst in body.Instructions) {
+            if (inst.OpCode.OperandType == OperandType.InlineBrTarget) {
+                Instruction br = inst.Operand as Instruction;
+                labels.Add(br.Offset);
+            }
+        }
+        labels.Sort();
+
+        var lEnum = labels.GetEnumerator();
+        bool hasLabels = lEnum.MoveNext();
+
         foreach(Instruction inst in body.Instructions) {
             Console.WriteLine("{0}", inst);
+
+            if (hasLabels && lEnum.Current == inst.Offset) {
+                LLVM.BasicBlock lbl = func.AppendBasicBlock("IL_"
+                                                  + inst.Offset.ToString("x4"));
+                _builder.CreateBr(lbl);
+                _builder.PositionAtEnd(lbl);
+                bb = lbl;
+                while (lEnum.Current == inst.Offset
+                       && (hasLabels = lEnum.MoveNext())) { }
+            }
 
 //TODO: pre-select instruction by type (flowcontrol, ...)
 
@@ -303,7 +328,7 @@ newobj.Dump();
         LLVM.Value val = _stack.Pop();
         LLVM.Value obj = _stack.Pop();
         LLVM.Value ptr = _builder.CreateStructGEP(obj, offset, field.Name + " pointer");
-        _builder.CreateStore(ptr, val);
+        _builder.CreateStore(val, ptr);
     }
 
     private void EmitOpCodeCall(MethodReference method)

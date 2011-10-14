@@ -45,6 +45,11 @@ public class Function : Value { // should inherit GlobalValue -> Constant -> Use
     {
         return new Value(LLVM.GetFirstParam(this));
     }
+
+    public BasicBlock AppendBasicBlock(string name)
+    {
+        return new BasicBlock(LLVM.AppendBasicBlock(this, name));
+    }
 }
 
 }
