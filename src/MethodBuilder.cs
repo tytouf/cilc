@@ -24,6 +24,7 @@ public class MethodBuilder
     List<LLVM.Value>   _variables;
     Stack<LLVM.Value>  _stack;
     List<LLVM.Value>   _params;
+    Dictionary<int, LLVM.BasicBlock> _labels;
 
     public MethodBuilder(LLVM.Builder builder, MethodData method)
     {
@@ -32,6 +33,7 @@ public class MethodBuilder
         _stack     = new Stack<LLVM.Value>();
         _params    = new List<LLVM.Value>();
         _variables = new List<LLVM.Value>();
+        _labels    = new Dictionary<int, LLVM.BasicBlock>();
     }
 
     public void EmitBody()
@@ -93,12 +95,21 @@ public class MethodBuilder
         //
         List<int> labels = new List<int>();
         foreach(Instruction inst in body.Instructions) {
-            if (inst.OpCode.OperandType == OperandType.InlineBrTarget) {
+            if (inst.OpCode.OperandType == OperandType.InlineBrTarget ||
+                inst.OpCode.OperandType == OperandType.ShortInlineBrTarget) {
+                if (inst.OpCode.FlowControl == FlowControl.Cond_Branch) {
+                    labels.Add(inst.Next.Offset);
+                }
                 Instruction br = inst.Operand as Instruction;
                 labels.Add(br.Offset);
             }
         }
         labels.Sort();
+
+        foreach(int offset in labels) {
+            LLVM.BasicBlock lbl = func.AppendBasicBlock("IL_" + offset.ToString("x4"));
+            _labels[offset] = lbl;
+        }
 
         var lEnum = labels.GetEnumerator();
         bool hasLabels = lEnum.MoveNext();
@@ -107,9 +118,11 @@ public class MethodBuilder
             Console.WriteLine("{0}", inst);
 
             if (hasLabels && lEnum.Current == inst.Offset) {
-                LLVM.BasicBlock lbl = func.AppendBasicBlock("IL_"
-                                                  + inst.Offset.ToString("x4"));
-                _builder.CreateBr(lbl);
+                LLVM.BasicBlock lbl = _labels[inst.Offset];
+                Console.WriteLine("offset " + inst.Offset);
+                if (!bb.HasTerminator) {
+                    _builder.CreateBr(lbl);
+                }
                 _builder.PositionAtEnd(lbl);
                 bb = lbl;
                 while (lEnum.Current == inst.Offset
@@ -182,6 +195,8 @@ public class MethodBuilder
             else if (inst.OpCode == OpCodes.Ldfld) EmitOpCodeLdfld(inst.Operand as FieldReference);
             else if (inst.OpCode == OpCodes.Stfld) EmitOpCodeStfld(inst.Operand as FieldReference);
 
+            else if (inst.OpCode == OpCodes.Bge) EmitOpCodeBge(inst);
+            else if (inst.OpCode == OpCodes.Ble) EmitOpCodeBle(inst);
 #if UNIMPLEMENTED
 /*
             case 0x5D:  // rem
@@ -515,6 +530,35 @@ newobj.Dump();
             _builder.CreateRet(ConvertToType(ret, retTy));
         }
     }
+
+#region Branch Opcodes
+    private void EmitOpCodeBge(Instruction inst)
+    {
+        // left >= right
+        LLVM.Value right = _stack.Pop();
+        LLVM.Value left  = _stack.Pop();
+        LLVM.Value cond  = _builder.CreateICmpSGE(left, right, "bge");
+        LLVM.BasicBlock bb2 = _labels[inst.Next.Offset];
+        Instruction jumpTo = inst.Operand as Instruction;
+        LLVM.BasicBlock bb1 = _labels[jumpTo.Offset];
+        System.Console.WriteLine("then " + inst.Next.Offset + " else " + jumpTo.Offset);
+        _builder.CreateCondBr(cond, bb1, bb2);
+    }
+
+    private void EmitOpCodeBle(Instruction inst)
+    {
+        // left >= right
+        LLVM.Value right = _stack.Pop();
+        LLVM.Value left  = _stack.Pop();
+        LLVM.Value cond  = _builder.CreateICmpSLE(left, right, "ble");
+        LLVM.BasicBlock bb2 = _labels[inst.Next.Offset];
+        Instruction jumpTo = inst.Operand as Instruction;
+        LLVM.BasicBlock bb1 = _labels[jumpTo.Offset];
+        System.Console.WriteLine("then " + inst.Next.Offset + " else " + jumpTo.Offset);
+        _builder.CreateCondBr(cond, bb1, bb2);
+    }
+#endregion
+
 } // end of MethodBuilder
 
 } // end of namespace Cilc
