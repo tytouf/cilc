@@ -18,6 +18,12 @@ public class BasicBlock : Value {
     {
     }
 
+    public bool HasTerminator
+    {
+	get {
+	    return LLVM.IsATerminatorInst(LLVM.GetLastInstruction(this));
+	}
+    }
 }
 
 }

@@ -92,6 +92,58 @@ public class Builder : RefBase {
 
 #endregion
 
+#region Comparison
+    public Value CreateICmpEQ(Value left, Value right, string name)
+    {
+        return new Value(LLVM.BuildICmp(this, IntPredicate.EQ, left, right, name));
+    }
+
+    public Value CreateICmpNE(Value left, Value right, string name)
+    {
+        return new Value(LLVM.BuildICmp(this, IntPredicate.NE, left, right, name));
+    }
+
+    public Value CreateICmpUGT(Value left, Value right, string name)
+    {
+        return new Value(LLVM.BuildICmp(this, IntPredicate.UGT, left, right, name));
+    }
+
+    public Value CreateICmpUGE(Value left, Value right, string name)
+    {
+        return new Value(LLVM.BuildICmp(this, IntPredicate.UGE, left, right, name));
+    }
+
+    public Value CreateICmpULT(Value left, Value right, string name)
+    {
+        return new Value(LLVM.BuildICmp(this, IntPredicate.ULT, left, right, name));
+    }
+
+    public Value CreateICmpULE(Value left, Value right, string name)
+    {
+        return new Value(LLVM.BuildICmp(this, IntPredicate.ULE, left, right, name));
+    }
+
+    public Value CreateICmpSGT(Value left, Value right, string name)
+    {
+        return new Value(LLVM.BuildICmp(this, IntPredicate.SGT, left, right, name));
+    }
+
+    public Value CreateICmpSGE(Value left, Value right, string name)
+    {
+        return new Value(LLVM.BuildICmp(this, IntPredicate.SGE, left, right, name));
+    }
+
+    public Value CreateICmpSLT(Value left, Value right, string name)
+    {
+        return new Value(LLVM.BuildICmp(this, IntPredicate.SLT, left, right, name));
+    }
+
+    public Value CreateICmpSLE(Value left, Value right, string name)
+    {
+        return new Value(LLVM.BuildICmp(this, IntPredicate.SLE, left, right, name));
+    }
+#endregion
+
 #region Logic
     public Value CreateAnd(Value left, Value right, string name)
     {
@@ -205,6 +257,11 @@ public class Builder : RefBase {
     public Value CreateBr(BasicBlock bb)
     {
         return new Value(LLVM.BuildBr(this, bb));
+    }
+
+    public Value CreateCondBr(Value cond, BasicBlock bbtrue, BasicBlock bbfalse)
+    {
+        return new Value(LLVM.BuildCondBr(this, cond, bbtrue, bbfalse));
     }
 }
 

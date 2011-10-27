@@ -12,6 +12,19 @@ using LLVM;
 
 namespace LLVM {
 
+public enum IntPredicate {
+    EQ = 32, // equal
+    NE,      // not equal
+    UGT,     // unsigned greater than
+    UGE,     // unsigned greater or equal
+    ULT,     // unsigned less than
+    ULE,     // unsigned less or equal
+    SGT,     // signed greater than
+    SGE,     // signed greater or equal
+    SLT,     // signed less than
+    SLE      // signed less or equal
+};
+
 class LLVM {
     const string LLVM_LIB = "libLLVM-2.9.so";
 
@@ -146,6 +159,11 @@ class LLVM {
     public static extern IntPtr AppendBasicBlock(IntPtr func, string name);
     [DllImport(LLVM_LIB, EntryPoint="LLVMInsertBasicBlock")]
     public static extern IntPtr InsertBasicBlock(IntPtr bb, string name);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMGetLastInstruction")]
+    public static extern IntPtr GetLastInstruction(IntPtr bb);
+
+    [DllImport(LLVM_LIB, EntryPoint="LLVMIsATerminatorInst")]
+    public static extern bool IsATerminatorInst(IntPtr instRef);
 #endregion
 
 #region Builder
@@ -154,10 +172,14 @@ class LLVM {
     [DllImport(LLVM_LIB, EntryPoint="LLVMPositionBuilderAtEnd")]
     public static extern void PositionBuilderAtEnd(IntPtr bldRef, IntPtr bbRef);
 
+    // Terminators
+
     [DllImport(LLVM_LIB, EntryPoint="LLVMBuildRetVoid")]
     public static extern IntPtr BuildRetVoid(IntPtr bldRef);
     [DllImport(LLVM_LIB, EntryPoint="LLVMBuildRet")]
     public static extern IntPtr BuildRet(IntPtr bldRef, IntPtr valRef);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMBuildCondBr")]
+    public static extern IntPtr BuildCondBr(IntPtr bldRef, IntPtr cond, IntPtr bbtrue, IntPtr bbfalse);
     [DllImport(LLVM_LIB, EntryPoint="LLVMBuildBr")]
     public static extern IntPtr BuildBr(IntPtr bldRef, IntPtr bbRef);
 
@@ -206,6 +228,10 @@ class LLVM {
     public static extern IntPtr BuildXor(IntPtr bldRef, IntPtr leftRef, IntPtr rightRef, string name);
     [DllImport(LLVM_LIB, EntryPoint="LLVMBuildNot")]
     public static extern IntPtr BuildNot(IntPtr bldRef, IntPtr vRef, string name);
+
+    // Comparison
+    [DllImport(LLVM_LIB, EntryPoint="LLVMBuildICmp")]
+    public static extern IntPtr BuildICmp(IntPtr bldRef, IntPredicate op, IntPtr LHS, IntPtr RHS, string name);
 
     //
     [DllImport(LLVM_LIB, EntryPoint="LLVMBuildTrunc")]
