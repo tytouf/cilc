@@ -62,6 +62,10 @@ public sealed class MethodData {
     private LLVM.FunctionType ConstructType()
     {
         LLVM.Type retTy = Cil2Llvm.GetType(_method.ReturnType);
+	if (_method.ReturnType.MetadataType == MetadataType.Class) {
+	    retTy = retTy.GetPointerTo();
+	}
+
         List<LLVM.Type> paramsTy = new List<LLVM.Type>();
         
         if (_method.HasThis) {
@@ -71,7 +75,7 @@ public sealed class MethodData {
         if (_method.HasParameters) {
             foreach (ParameterDefinition p in _method.Parameters) {
                 LLVM.Type ty = Cil2Llvm.GetType(p.ParameterType);
-                if (!p.ParameterType.IsPrimitive) {
+                if (p.ParameterType.MetadataType == MetadataType.Class) {
                     ty = ty.GetPointerTo();
                 }
                 paramsTy.Add(ty);

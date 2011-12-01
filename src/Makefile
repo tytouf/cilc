@@ -11,6 +11,6 @@ LIBS = -r:Mono.Cecil.dll -r:llvm.dll
 DEBUG = -debug
 
 cilc: $(SRC_FILES)
-	gmcs $(DEBUG) -lib:../lib -out:cilc.exe $(SRC_FILES) $(LIBS)
+	gmcs $(DEBUG) -d:TRACE -lib:../lib -out:cilc.exe $(SRC_FILES) $(LIBS)
 
 

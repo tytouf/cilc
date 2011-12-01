@@ -32,9 +32,9 @@ abstract class CLR {
        public static LLVM.Value Const_8;
        public static LLVM.Value Const_m1;
 
-         public static LLVM.Function Newobj;
-         public static LLVM.Function Newstr;
-         public static LLVM.Function Newarr;
+       public static LLVM.Function Newobj;
+       public static LLVM.Function Newstr;
+       public static LLVM.Function Newarr;
       
        public static void Initialize(LLVM.Module module)
        {

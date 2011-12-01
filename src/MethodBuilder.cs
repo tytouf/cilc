@@ -323,8 +323,7 @@ newobj.Dump();
         FieldDefinition f = field as FieldDefinition;
 
         uint offset = ty.GetFieldOffset(f);
-        LLVM.Value obj = _stack.Pop();
-        Trace.Assert(obj.Type == ty.Type.GetPointerTo());
+        LLVM.Value obj = ConvertToType(_stack.Pop(), ty.Type.GetPointerTo());
         LLVM.Value ptr = _builder.CreateStructGEP(obj, offset, field.Name + " pointer");
         LLVM.Value fld = _builder.CreateLoad(ptr, "ldfld");
         _stack.Push(fld);
@@ -341,7 +340,7 @@ newobj.Dump();
 
         uint offset = ty.GetFieldOffset(f);
         LLVM.Value val = _stack.Pop();
-        LLVM.Value obj = _stack.Pop();
+        LLVM.Value obj = ConvertToType(_stack.Pop(), ty.Type.GetPointerTo());
         LLVM.Value ptr = _builder.CreateStructGEP(obj, offset, field.Name + " pointer");
         _builder.CreateStore(val, ptr);
     }

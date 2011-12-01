@@ -108,7 +108,7 @@ sealed class CodeGenType
                     continue;
                 }
                 LLVM.Type ty = Cil2Llvm.GetType(f.FieldType);
-                if (!f.FieldType.IsPrimitive) {
+                if (f.FieldType.MetadataType == MetadataType.Class) {
                     ty = ty.GetPointerTo();
                 }
                 l.Add(ty);
@@ -140,7 +140,7 @@ sealed class CodeGenType
                     continue;
                 }
                 LLVM.Type ty = Cil2Llvm.GetType(f.FieldType);
-                if (!f.FieldType.IsPrimitive) {
+                if (f.FieldType.MetadataType == MetadataType.Class) {
                     ty = ty.GetPointerTo();
                 }
                 l.Add(ty);
