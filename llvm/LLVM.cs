@@ -26,7 +26,7 @@ public enum IntPredicate {
 };
 
 class LLVM {
-    const string LLVM_LIB = "libLLVM-2.9.so";
+    const string LLVM_LIB = "libLLVM-3.0.so";
 
     [DllImport(LLVM_LIB, EntryPoint="LLVMContextCreate")]
     public static extern IntPtr ContextCreate();
@@ -72,6 +72,12 @@ class LLVM {
 
     [DllImport(LLVM_LIB, EntryPoint="LLVMStructType")]
     public static extern IntPtr StructType(IntPtr[] typesRef, uint count, bool packed);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMStructCreateNamed")]
+    public static extern IntPtr StructCreateNamed(IntPtr ctxRef, string name);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMStructSetBody")]
+    public static extern IntPtr StructSetBody(IntPtr tyRef, IntPtr[] typesRef, uint count, bool packed);
+    [DllImport(LLVM_LIB, EntryPoint="LLVMGetStructName")]
+    public static extern IntPtr GetStructName(IntPtr tyRef);
     [DllImport(LLVM_LIB, EntryPoint="LLVMCountStructElementTypes")]
     public static extern uint CountStructElementTypes(IntPtr typeRef);
 

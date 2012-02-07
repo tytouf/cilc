@@ -54,11 +54,6 @@ public class Module : RefBase {
     {
         LLVM.DumpModule(this);
     }
-
-    public bool AddTypeName(string name, Type type)
-    {
-        return LLVM.AddTypeName(this, name, type);
-    }
 }
 
 }

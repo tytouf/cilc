@@ -3,6 +3,7 @@ SRC_FILES = LLVM.cs RefBase.cs \
             Analysis.cs \
             Builder.cs \
 	    BasicBlock.cs \
+	    Context.cs \
             Type.cs DerivedType.cs IntegerType.cs OpaqueType.cs \
             FunctionType.cs \
             CompositeType.cs StructType.cs \
@@ -14,4 +15,4 @@ SRC_FILES = LLVM.cs RefBase.cs \
             TargetData.cs
 
 all: $(SRC_FILES)
-	gmcs -t:library -out:llvm.dll $(SRC_FILES)
+	gmcs -debug -t:library -out:llvm.dll $(SRC_FILES)
