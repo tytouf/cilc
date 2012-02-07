@@ -6,7 +6,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
 
 namespace LLVM {
 
@@ -24,7 +23,11 @@ public class Value : RefBase {
     public string Name
     {
         set { LLVM.SetValueName(this, value); }
-        get { return LLVM.GetValueName(this); }
+        get
+        {
+            IntPtr ptr  = LLVM.GetValueName(this);
+            return Marshal.PtrToStringAnsi(ptr);
+        }
     }
 
     public void Dump()
@@ -36,7 +39,6 @@ public class Value : RefBase {
     {
         return new Value(LLVM.ConstInt(ty, val, true));
     }
-
 
 }
 

@@ -113,7 +113,7 @@ class LLVM {
     [DllImport(LLVM_LIB, EntryPoint="LLVMSetValueName")]
     public static extern void SetValueName(IntPtr val, string name);
     [DllImport(LLVM_LIB, EntryPoint="LLVMGetValueName")]
-    public static extern string GetValueName(IntPtr val);
+    public static extern IntPtr GetValueName(IntPtr val);
     [DllImport(LLVM_LIB, EntryPoint="LLVMDumpValue")]
     public static extern void DumpValue(IntPtr val);
     [DllImport(LLVM_LIB, EntryPoint="LLVMTypeOf")]
