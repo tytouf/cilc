@@ -11,22 +11,27 @@ using System.Collections.Generic;
 namespace LLVM {
 
 public class Module : RefBase {
+    Context _ctx;
+
     public Module(string name) : base(LLVM.ModuleCreateWithName(name))
     {
+        _ctx = null;
     }
 /*
     public Module(string name, Context ctx) : base(LLVM.ModuleCreateWithNameInContext(name, ctx))
     {
     }
-
+*/
     public Context Context
     {
         get
         {
-            return new Context(LLVM.GetModuleContext(this));
+            if (_ctx == null) {
+                _ctx = new Context(LLVM.GetModuleContext(this));
+            }
+            return _ctx;
         }
     }
-*/
 
     public string DataLayout
     {
