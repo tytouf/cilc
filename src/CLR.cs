@@ -38,34 +38,35 @@ abstract class CLR {
       
        public static void Initialize(LLVM.Module module)
        {
-            TargetData tgt = new TargetData("e-p:32:32:32-i1:8:8-i8:8:8-i16:16:16-i32:32:32-i64:32:64-f32:32:32-f64:32:64-v64:64:64-v128:128:128-a0:0:64-f80:32:32-n8:16:32");
+          TargetData tgt = new TargetData("e-p:32:32:32-i1:8:8-i8:8:8-i16:16:16-i32:32:32-i64:32:64-f32:32:32-f64:32:64-v64:64:64-v128:128:128-a0:0:64-f80:32:32-n8:16:32");
+          // TargetData tgt = new TargetData(module.DataLayout);
 
           Void = LLVM.Type.GetVoid();
-          module.AddTypeName("type System.Void", Void);
+          //module.AddTypeName("type System.Void", Void);
           Bool = LLVM.Type.GetInt8();
-          module.AddTypeName("type System.Bool", Bool);
+          //module.AddTypeName("type System.Bool", Bool);
           Char = LLVM.Type.GetInt8();
-          module.AddTypeName("type System.Char", Char);
+          //module.AddTypeName("type System.Char", Char);
           Int8 = LLVM.Type.GetInt8();
-          module.AddTypeName("type System.Int8", Int8);
+          //module.AddTypeName("type System.Int8", Int8);
           Int16 = LLVM.Type.GetInt16();
-          module.AddTypeName("type System.Int16", Int16);
+          //module.AddTypeName("type System.Int16", Int16);
           Int32 = LLVM.Type.GetInt32();
-          module.AddTypeName("type System.Int32", Int32);
+          //module.AddTypeName("type System.Int32", Int32);
           Int64 = LLVM.Type.GetInt64();
-          module.AddTypeName("type System.Int64", Int64);
+          //module.AddTypeName("type System.Int64", Int64);
 
-            Native = tgt.GetIntPtrType();
-          module.AddTypeName("type System.Native", Native);
+          Native = tgt.GetIntPtrType();
+          //module.AddTypeName("type System.Native", Native);
 
-            Ptr = Native.GetPointerTo(0);
-          module.AddTypeName("type System.Ptr", Ptr);
+          Ptr = Native.GetPointerTo(0);
+          //module.AddTypeName("type System.Ptr", Ptr);
           
-          Object = LLVM.StructType.Get(new LLVM.Type[2] { Int32, Int32 }, false);
-          module.AddTypeName("type System.Object", Object);
+          Object = LLVM.StructType.Get(module.Context, "type System.Object", new LLVM.Type[2] { Int32, Int32 }, false);
+          //module.AddTypeName("type System.Object", Object);
 
           String = LLVM.Type.GetInt8(); // FIXME, TODO
-          module.AddTypeName("type System.String", String);
+          //module.AddTypeName("type System.String", String);
 
           // Initialize constants
           //
@@ -82,15 +83,15 @@ abstract class CLR {
 
           LLVM.FunctionType ft = LLVM.FunctionType.Get(Object.GetPointerTo(0),
                                     new LLVM.Type[1] { Native }, false);
-            Newobj = new LLVM.Function(module, "newobj", ft);
+          Newobj = new LLVM.Function(module, "newobj", ft);
 
           ft = LLVM.FunctionType.Get(String.GetPointerTo(0),
                                new LLVM.Type[1] { Int8.GetPointerTo(0) }, false);
-            Newstr = new LLVM.Function(module, "newstring", ft);
+          Newstr = new LLVM.Function(module, "newstring", ft);
 
           ft = LLVM.FunctionType.Get(Object.GetPointerTo(0),
                                   new LLVM.Type[2] { Native, Native }, false);
-            Newarr = new LLVM.Function(module, "newarr", ft);
+          Newarr = new LLVM.Function(module, "newarr", ft);
       }
 
       static internal LLVM.Value GetConstant(Int64 val)
